@@ -34,5 +34,125 @@ let traversalStartLen = (selRange) => {
     return startIndex
 }
 
+/**
+ * 将选取文本转换成特定样式
+ * @param info range对象信息
+ * @returns {number}
+ */
+let transfer = (info) => {
 
-export {traversalStartLen};
+    let startIndex = info.start_index,
+        //剩余长度
+        restTextLen = info.text_length,
+        //第一次是公共父节点
+        ancestorNode = $(info.common_tag)[info.tag_index],
+        //起止游标
+        startSearched = false,
+        endSearched = false,
+        //已查找长度
+        beginTextLen = 0;
+
+    /**
+     * 遍历节点渲染
+     */
+    let traversalRender = (currentNode) => {
+
+        if (endSearched) return 2;
+
+        if(!startSearched && currentNode.nodeType == 3) {
+            let normalTextLen = currentNode.nodeValue.length;
+            if(beginTextLen + normalTextLen >= startIndex) {
+                startSearched = true;
+                currentNode.splitText(startIndex - beginTextLen);
+                //判断长度,初始节点不可能和结束节点在同一个dom上
+                changeNodeStyle(currentNode.nextSibling);
+                //找到了开头,下一个循环
+                return 1;
+            }else {
+                //没找到开始节点,接着找
+                beginTextLen += normalTextLen;
+            }
+        }
+        //已经找到开始节点,且当前节点是text节点,且不为空
+        if (startSearched && currentNode.nodeType == 3) {
+            let normalTextLen = currentNode.nodeValue.length;
+
+            //判断长度
+            if (normalTextLen >= restTextLen) {
+                currentNode.splitText(restTextLen);
+                changeNodeStyle(currentNode);
+                endSearched = true;
+                //全都找完了,退出
+                return 2;
+            } else {
+                restTextLen -= normalTextLen;
+                changeNodeStyle(currentNode);
+            }
+        }
+
+        let nodes = currentNode.childNodes;
+
+        //遍历孩子节点
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            let result = traversalRender(node);
+            if (result == 2) break;
+        }
+    }
+
+    /**
+     * 改变选取区域样式
+     */
+    let changeNodeStyle = (node) => {
+        let par = node.parentNode;
+        let spanEle = document.createElement('rxl');
+        spanEle.setAttribute('class', 'rxl');
+        spanEle.appendChild(node.cloneNode(false));
+        //使用替换节点的方法
+        par.replaceChild(spanEle, node);
+    }
+
+    traversalRender(ancestorNode);
+
+}
+
+/**
+ * 翻转标注,还原成正常dom
+ * @param info
+ */
+let reverse = (info) => {
+
+    let restTextLen = info.text_length,
+        //第一次是公共父节点
+        ancestorNode = $(info.common_tag)[info.tag_index];
+
+    let core = (node) => {
+        if(node.tagName == 'RXL') {
+            if(node.childNodes) {
+                for(let i = 0; i < node.childNodes.length; i++) {
+                    let result = core(node.childNodes[i]);
+                    if(result == 2) {
+                        break;
+                    }
+                }
+            }
+            node.parentNode.replaceChild(document.createTextNode(node.cloneNode(true).innerHTML), node);
+            restTextLen -= node.innerHTML.length;
+            if(restTextLen == 0) {
+                return 2;
+            }else {
+                return 1;
+            }
+        }
+        for(let i = 0; i < node.childNodes.length; i++) {
+            let result = core(node.childNodes[i]);
+            if(result == 2) {
+                break;
+            }
+        }
+    }
+    core(ancestorNode);
+}
+
+
+export {traversalStartLen, transfer, reverse};

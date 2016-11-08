@@ -1,11 +1,11 @@
 'use strict';
 
 import '../css/base.css';
-import {traversalStartLen} from './util';
+import {traversalStartLen, transfer, reverse} from './util';
 import $ from 'jquery';
 
 /**
- * 批注组件
+ * 批注组件,兼容IE9
  */
 class FMark {
 
@@ -68,7 +68,7 @@ class FMark {
             let existList = JSON.parse(localStorage.getItem('fmark'));
             for(let i = 0; i < existList.length; i++) {
                 console.log(existList[i]);
-                // this.transfer(existList[i]);
+                // transfer(existList[i]);
             }
         }
 
@@ -91,119 +91,47 @@ class FMark {
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
 
+                console.log(selRange, selRange.commonAncestorContainer, selRange.commonAncestorContainer.nodeType,selRange.commonAncestorContainer.nodeName);
+
                 //选中区域有文字
                 if(selObj.toString()) {
+
+                    let common_node = selRange.commonAncestorContainer;
+                    if(selRange.commonAncestorContainer.nodeType !== 1) {
+                        common_node = selRange.commonAncestorContainer.parentNode;
+                    }
 
                     //需要储存的信息
                     let currentRangeInfo = {
                         start_index: traversalStartLen(selRange),
                         text_length:  $.trim(selRange.toString()).length,
-                        common_tag: selRange.commonAncestorContainer.nodeName,
-                        tag_index: $(selRange.commonAncestorContainer).index(selRange.commonAncestorContainer.nodeName)
+                        common_tag: common_node.nodeName,
+                        tag_index: $(common_node).index(common_node.nodeName)
                     }
 
                     //起止文本在一个元素内
                     if(selRange.startContainer == selRange.endContainer) {
-                        //兼容性IE9
                         selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
                     }else {
                         //选中的文本是跨元素的,所以父级元素肯定有孩子元素
-                        _this.transfer(currentRangeInfo);
+                        transfer(currentRangeInfo);
                     }
 
                     //TODO 存本地调试
-                    // _this.fmarkList.push(currentRangeInfo);
-                    // localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
+                    _this.fmarkList.push(currentRangeInfo);
+                    console.log(_this.fmarkList);
+                    localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
                 }
             }
             $(document).off('mousemove');
             _this.ifDrag = false;
         })
-    }
 
-    /**
-     * 将选取文本转换成特定样式
-     * @param info range对象信息
-     * @returns {number}
-     */
-    transfer(info) {
 
-        let startIndex = info.start_index,
-            //剩余长度
-            restTextLen = info.text_length,
-            //第一次是公共父节点
-            ancestorNode = $(info.common_tag)[info.tag_index],
-            //起止游标
-            startSearched = false,
-            endSearched = false,
-            //已查找长度
-            beginTextLen = 0;
+        $('.delete').on('click', function() {
 
-        /**
-         * 遍历节点渲染
-         */
-        let traversalRender = (currentNode) => {
-
-            if (endSearched) return 2;
-
-            if(!startSearched && currentNode.nodeType == 3) {
-                let normalTextLen = currentNode.nodeValue.length;
-                if(beginTextLen + normalTextLen >= startIndex) {
-                    startSearched = true;
-                    currentNode.splitText(startIndex - beginTextLen);
-                    console.log('startSearched', currentNode.nextSibling);
-                    //判断长度,初始节点不可能和结束节点在同一个dom上
-                    changeNodeStyle(currentNode.nextSibling);
-                    //找到了开头,下一个循环
-                    return 1;
-                }else {
-                    //没找到开始节点,接着找
-                    beginTextLen += normalTextLen;
-                    console.log(currentNode, beginTextLen);
-                }
-            }
-            //已经找到开始节点,且当前节点是text节点,且不为空
-            if (startSearched && currentNode.nodeType == 3) {
-                let normalTextLen = currentNode.nodeValue.length;
-
-                //判断长度
-                if (normalTextLen >= restTextLen) {
-                    currentNode.splitText(restTextLen);
-                    changeNodeStyle(currentNode);
-                    endSearched = true;
-                    //全都找完了,退出
-                    return 2;
-                } else {
-                    restTextLen -= normalTextLen;
-                    console.log(currentNode);
-                    changeNodeStyle(currentNode);
-                }
-            }
-
-            let nodes = currentNode.childNodes;
-
-            //遍历孩子节点
-            for (let i = 0; i < nodes.length; i++) {
-                let node = nodes[i];
-                let result = traversalRender(node);
-                if (result == 2) break;
-            }
-        }
-
-        /**
-         * 改变选取区域样式
-         */
-        let changeNodeStyle = (node) => {
-            let par = node.parentNode;
-            let spanEle = document.createElement('rxl');
-            spanEle.setAttribute('class', 'rxl');
-            spanEle.appendChild(node.cloneNode(false));
-            //使用替换节点的方法
-            par.replaceChild(spanEle, node);
-        }
-
-        traversalRender(ancestorNode);
-
+            reverse(_this.fmarkList[0]);
+        })
     }
 }
 
