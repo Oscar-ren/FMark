@@ -16,7 +16,7 @@
     "webpack": "^1.12.2"
   },
   "scripts": {
-    "watch": "webpack-dev-server --watch"
+    "start": "webpack-dev-server --watch"
   },
   "author": "",
   "license": "ISC"
