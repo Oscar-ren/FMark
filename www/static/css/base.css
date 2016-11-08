@@ -1,7 +1,6 @@
-rxl.rxl:hover {
+.rxl {
     text-decoration: underline;
 }
-
 .mark-it {
     list-style: none;
     padding: 8px;

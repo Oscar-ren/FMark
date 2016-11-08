@@ -6,7 +6,7 @@
     "start": "node www/development.js",
     "compile": "babel --presets es2015-loose,stage-1 --plugins transform-runtime src/ --out-dir app/ --source-maps",
     "watch-compile": "node -e \"console.log('<npm run watch-compile> no longer need, use <npm start> command direct.');console.log();\"",
-    "watch": "webpack-dev-server --watch"
+    "watch": "webpack --process --watch"
   },
   "dependencies": {
     "thinkjs": "2.2.x",
