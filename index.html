@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试用例</title>
+    <style>
+        .rxl {
+            text-decoration: underline;
+            user-select: none;
+        }
+
+        .action-list li {
+            display: inline-block;
+            border-right: 1px solid #5b5b58;
+        }
+        .action-list {
+            padding: 8px;
+            border-radius: 5px;
+            position: absolute;
+            background: #4c4c48;
+            display: none;
+        }
+        ul {
+            list-style: none;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <input type="text">
+    <h4>这是一个标题</h4>
+    <p>
+        <span>第一段话</span>
+        <span>这是第一段话的内容,我要写的长一点才好测试</span>
+    </p>
+    <img src="" alt="没图" title="爱咋咋地">
+    <p>
+        <span>第二段话</span>
+        <span>第二段话也要写的长一点,是为了更好的观看</span>
+    </p>
+
+
+    <ul class="action-list">
+        <li class="action-underline">
+            <button class="underline">划线</button>
+        </li>
+        <li class="action-note">
+            <button class="note">批注</button>
+        </li>
+    </ul>
+</div>
+
+<div class="showResult">
+    这里是结果
+</div>
+<script src="./jquery-1.12.1.min.js"></script>
+<script src="./index.js"></script>
+</body>
+</html>
