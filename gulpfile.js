@@ -4,7 +4,7 @@ var babelify = require('babelify');
 
 gulp.task('server', function() {
 
-    return budo('./index.js', {
+    return budo('www/static/js/index.js', {
         live: true,             // setup live reload
         port: 8000,             // use this port
         browserify: {

@@ -12,6 +12,8 @@ class FMark {
         this.isMouseUp = false;
 
         this.markPopup = undefined;
+
+        this.host = 'http://localhost:8360';
     }
 
     render() {}

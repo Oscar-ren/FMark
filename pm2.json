@@ -1,0 +1,16 @@
+{
+  "apps": [{
+    "name": "E:FMarkE:FMarkFMark2",
+    "script": "www/production.js",
+    "cwd": "E:\FMark\FMark2",
+    "exec_mode": "cluster",
+    "instances": 0,
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      
+    }
+  }]
+}
