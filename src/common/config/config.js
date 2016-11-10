@@ -4,5 +4,4 @@
  */
 export default {
   //key: value
-  port: 8360
 };

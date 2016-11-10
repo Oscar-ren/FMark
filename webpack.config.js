@@ -3,8 +3,9 @@ var webpack = require('webpack');
 module.exports = {
     entry: './www/static/js/index.js',
     output: {
-        path: __dirname,
-        filename: './www/static/dist/bundle.js'
+        publicPath : 'dist',
+        path: __dirname + '/www/static/dist/',
+        filename: 'bundle.js'
     },
     module: {
         loaders: [
