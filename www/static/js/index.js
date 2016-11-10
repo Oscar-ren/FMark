@@ -1,11 +1,11 @@
 'use strict';
 
 import '../css/base.css';
-import {traversalStartLen} from './util';
+import {traversalStartLen, transfer, reverse} from './util';
 import $ from 'jquery';
-
+import Modal from './modal'
 /**
- * 批注组件
+ * 批注组件,兼容IE9
  */
 class FMark {
 
@@ -16,51 +16,11 @@ class FMark {
         this.fmarkList = [];
         //标识,是否是mouseup事件后的点击事件
         this.isMouseUp = false;
-
-        this.markPopup = undefined;
-
-        this.host = 'http://localhost:8360';
+        
     }
 
     render() {}
-    onMakeIt(posX, posY) {
-        //todo 点击mark it 的回调
-        console.log('aaa');
-        this.hideMarkPopup();
-    }
-    initMarkPopup() {
-        let _this = this;
-        let markPopup = document.createElement('ul');
-        markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note"><button class="note">Mark it!</button></li>'
-        
-        document.body.appendChild(markPopup);
-        this.markPopup = markPopup;
-    }
-    initMarkModal() {
-        let _this = this;
-        let markModal = document.createElement('div');
-        markModal.className = 'mark-modal';
-    }
-    showMarkPopup(posX, posY) {
-        if (!this.markPopup) {
-            this.initMarkPopup();
-        }
-        let _this = this;
-        _this.markPopup.onclick = function() {
-            _this.onMakeIt(posX, posY);
-        }
-        //修正的像素是为了尖角在所想的位置
-        this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 40  + 'px';
-        this.markPopup.style.display = 'block';
-        setTimeout(function() {
-            _this.hideMarkPopup();
-        }, 1000 * 4);
-    }
-    hideMarkPopup() {
-        this.markPopup && (this.markPopup.style.display = 'none');
-    }
+    
     bindEvent() {
 
         let _this = this;
@@ -70,32 +30,16 @@ class FMark {
             let existList = JSON.parse(localStorage.getItem('fmark'));
             for(let i = 0; i < existList.length; i++) {
                 console.log(existList[i]);
-                // this.transfer(existList[i]);
+                // transfer(existList[i]);
             }
         }
-
-
-        /**
-         * 弹窗事件
-         */
-        $(document).on('click', function(e) {
-
-            if(_this.isMouseUp) {
-                _this.isMouseUp = false;
-                return;
-            }
-            if($('.action-list')[0] && $.contains($('.action-list')[0],e.target) || $('.action-list')[0] == e.target) {
-                return;
-            }
-            $('.action-list').hide();
-        })
 
         /**
          * 保证只有拖拽下选择的文本才会输出
          */
         $(document).on('mousedown', function() {
             _this.mouseDownStartTime = Date.now();
-            _this.hideMarkPopup();
+            Modal.hideMarkPopup();
             $(document).on('mousemove', function() {
                 _this.ifDrag = true;
             })
@@ -109,130 +53,48 @@ class FMark {
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
 
+                console.log(selRange, selRange.commonAncestorContainer, selRange.commonAncestorContainer.nodeType,selRange.commonAncestorContainer.nodeName);
+
                 //选中区域有文字
                 if(selObj.toString()) {
 
-                    let currentRangeInfo = {
-                        startContainer: selRange.startContainer,
-                        startOffset:  selRange.startOffset,
-                        textLength:  $.trim(selRange.toString()).length,
-                        commonTag: selRange.commonAncestorContainer.nodeName,
-                        tagIndex: $(selRange.commonAncestorContainer).index(selRange.commonAncestorContainer.nodeName)
+                    Modal.showMarkPopup(200, 100);
+                    let common_node = selRange.commonAncestorContainer;
+                    if(selRange.commonAncestorContainer.nodeType !== 1) {
+                        common_node = selRange.commonAncestorContainer.parentNode;
                     }
 
-                    console.log(traversalStartLen(selRange));
+                    //需要储存的信息
+                    let currentRangeInfo = {
+                        start_index: traversalStartLen(selRange),
+                        text_length:  $.trim(selRange.toString()).length,
+                        common_tag: common_node.nodeName,
+                        tag_index: $(common_node).index(common_node.nodeName)
+                    }
 
                     //起止文本在一个元素内
                     if(selRange.startContainer == selRange.endContainer) {
-                        //兼容性IE9
                         selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
                     }else {
                         //选中的文本是跨元素的,所以父级元素肯定有孩子元素
-                        _this.transfer(currentRangeInfo);
+                        transfer(currentRangeInfo);
                     }
-                    // _this.fmarkList.push(currentRangeInfo);
 
                     //TODO 存本地调试
-                    // localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
-
-                    //TODO 挂载弹窗,最好是promise,需要位置绝对定位,e.clientX,e.clientY
-                    _this.isMouseUp = true;
-                    //$('.action-list').show().css('top', e.clientY + 'px').css('left', e.clientX + 'px');
-
+                    _this.fmarkList.push(currentRangeInfo);
+                    console.log(_this.fmarkList);
+                    localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
                 }
             }
             $(document).off('mousemove');
             _this.ifDrag = false;
         })
-    }
 
-    /**
-     * 将选取文本转换成特定样式
-     * 问题: 长度少一,原因是找到了开始节点后添加了子节点,又遍历了子节点,导致子节点被减两次
-     * 解决方法: 设置个flag,开始节点后跳过其子节点
-     * @param info range对象信息
-     * @returns {number}
-     */
-    transfer(info) {
 
-        let startOffset = info.startOffset,
-            startContainer = info.startContainer,
-            //剩余长度
-            restTextLen = info.textLength,
-            //第一次是公共父节点
-            ancestorNode = $(info.commonTag)[info.tagIndex],
-            //起止游标
-            startSearched = false,
-            endSearched = false;
+        $('.delete').on('click', function() {
 
-        /**
-         * 遍历节点渲染
-         */
-        let traversalRender = (currentNode) => {
-
-            if (endSearched) return 2;
-
-            if (currentNode == startContainer) {
-                //深度遍历替换元素
-                startSearched = true;
-                let nextSibling = currentNode.splitText(startOffset);
-
-                //判断长度,初始节点不可能和结束节点在同一个dom上
-                restTextLen -= $.trim(nextSibling.nodeValue).length;
-                changeNodeStyle(currentNode.nextSibling);
-                //找到了开头,下一个循环
-                return 1;
-            }
-            //已经找到开始节点,且当前节点是text节点,且不为空
-            if (startSearched && currentNode.nodeType == 3 && currentNode.nodeValue.length > 0) {
-                let normalTextLen = currentNode.nodeValue.length;
-
-                //判断长度
-                if (normalTextLen >= restTextLen) {
-                    currentNode.splitText(restTextLen);
-                    changeNodeStyle(currentNode);
-                    endSearched = true;
-                    //全都找完了,退出
-                    return 2;
-                } else {
-                    restTextLen -= normalTextLen;
-                    changeNodeStyle(currentNode);
-                }
-            }
-
-            let nodes = currentNode.childNodes,
-                flag = false;
-
-            //遍历孩子节点
-            for (let i = 0; i < nodes.length; i++) {
-                let node = nodes[i];
-                //flag阻止开始节点子节点的第二次计算
-                if (flag) {
-                    flag = false;
-                    continue;
-                }
-                let result = traversalRender(node);
-                if (result == 2) break;
-                if (result == 1) {
-                    flag = true;
-                }
-            }
-        }
-
-        /**
-         * 改变选取区域样式
-         */
-        let changeNodeStyle = (node) => {
-            let par = node.parentNode;
-            let spanEle = document.createElement('rxl');
-            spanEle.setAttribute('class', 'rxl');
-            spanEle.appendChild(node.cloneNode(false));
-            //使用替换节点的方法
-            par.replaceChild(spanEle, node);
-        }
-
-        traversalRender(ancestorNode);
-
+            reverse(_this.fmarkList[0]);
+        })
     }
 }
 

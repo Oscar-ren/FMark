@@ -1,7 +1,6 @@
-rxl.rxl:hover {
+.rxl {
     text-decoration: underline;
 }
-
 .mark-it {
     list-style: none;
     padding: 8px;
@@ -12,6 +11,21 @@ rxl.rxl:hover {
     display: none;
 }
 .mark-it .mark-triangle .triangle {
+    position: absolute;
+    display: block;
+    border-bottom: solid 7px #4c4c48;
+    border-left: solid 8px transparent;
+    border-right: solid 8px transparent;
+    top: -6px;
+    left: 32px;
+}
+.mark-modal {
+    display: none;
+    position: absolute;
+    width: 300px;
+    height: 200px;
+}
+.mark-modal .mark-triangle .triangle {
     position: absolute;
     display: block;
     border-bottom: solid 7px #4c4c48;

@@ -24,8 +24,5 @@ module.exports = {
     },
     plugins: [
         new webpack.BannerPlugin('welcome to use FMark!')
-    ],
-    devServer: {
-        inline: true
-    }
+    ]
 }
