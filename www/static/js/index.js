@@ -39,7 +39,7 @@ class FMark {
          */
         $(document).on('mousedown', function() {
             _this.mouseDownStartTime = Date.now();
-            Modal.hideMarkPopup();
+            // Modal.hideMarkPopup();
             $(document).on('mousemove', function() {
                 _this.ifDrag = true;
             })
