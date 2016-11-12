@@ -58,6 +58,9 @@ class FMark {
                     let rangeRect = selRange.getClientRects(),
                         rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2
                     Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, selRange);
+
+                    //TODO 划线
+                    _this.markLine(selRange);
                 }
             }
             $(document).off('mousemove');
