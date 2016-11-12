@@ -20,7 +20,6 @@ class FMark {
     }
 
     render() {}
-    
     bindEvent() {
 
         let _this = this;
@@ -29,7 +28,7 @@ class FMark {
         if(localStorage.getItem('fmark')) {
             let existList = JSON.parse(localStorage.getItem('fmark'));
             for(let i = 0; i < existList.length; i++) {
-                console.log(existList[i]);
+                // console.log(existList[i]);
                 // transfer(existList[i]);
             }
         }
@@ -39,13 +38,13 @@ class FMark {
          */
         $(document).on('mousedown', function() {
             _this.mouseDownStartTime = Date.now();
-            Modal.hideMarkPopup();
             $(document).on('mousemove', function() {
                 _this.ifDrag = true;
             })
         })
 
         $(document).on('mouseup', function(e) {
+            Modal.hideMarkPopup();
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && e.target !== $('html')[0]) {
@@ -53,48 +52,44 @@ class FMark {
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
 
-                console.log(selRange, selRange.commonAncestorContainer, selRange.commonAncestorContainer.nodeType,selRange.commonAncestorContainer.nodeName);
-
                 //选中区域有文字
                 if(selObj.toString()) {
+                    //吊起功能框
+                    let rangeRect = selRange.getClientRects(),
+                        rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, selRange);
 
-                    Modal.showMarkPopup(200, 100);
-                    let common_node = selRange.commonAncestorContainer;
-                    if(selRange.commonAncestorContainer.nodeType !== 1) {
-                        common_node = selRange.commonAncestorContainer.parentNode;
-                    }
-
-                    //需要储存的信息
-                    let currentRangeInfo = {
-                        start_index: traversalStartLen(selRange),
-                        text_length:  $.trim(selRange.toString()).length,
-                        common_tag: common_node.nodeName,
-                        tag_index: $(common_node).index(common_node.nodeName)
-                    }
-
-                    //起止文本在一个元素内
-                    if(selRange.startContainer == selRange.endContainer) {
-                        selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
-                    }else {
-                        //选中的文本是跨元素的,所以父级元素肯定有孩子元素
-                        transfer(currentRangeInfo);
-                    }
-
-                    //TODO 存本地调试
-                    _this.fmarkList.push(currentRangeInfo);
-                    console.log(_this.fmarkList);
-                    localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
+                    //TODO 划线
+                    _this.markLine(selRange);
                 }
             }
             $(document).off('mousemove');
             _this.ifDrag = false;
         })
+    }
+    //划线
+    markLine(selRange) {
 
+        let common_node = selRange.commonAncestorContainer;
+        if(selRange.commonAncestorContainer.nodeType !== 1) {
+            common_node = selRange.commonAncestorContainer.parentNode;
+        }
 
-        $('.delete').on('click', function() {
+        //需要储存的信息
+        let currentRangeInfo = {
+            start_index: traversalStartLen(selRange),
+            text_length:  $.trim(selRange.toString()).length,
+            common_tag: common_node.nodeName,
+            tag_index: $(common_node).index(common_node.nodeName)
+        }
 
-            reverse(_this.fmarkList[0]);
-        })
+        //起止文本在一个元素内
+        if(selRange.startContainer == selRange.endContainer) {
+            selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
+        }else {
+            //选中的文本是跨元素的,所以父级元素肯定有孩子元素
+            transfer(currentRangeInfo);
+        }
     }
 }
 
