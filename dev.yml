@@ -1,0 +1,14 @@
+apps:
+    - name : FMark
+      script : www/production.js
+      exec_mode : fork
+      instances : 1
+      max_memory_restart : 800M
+      autorestart : true
+      node_args : [--es_staging]
+      watch : [src]
+      args : []
+      env :
+          resource: true
+          webpack_on: true
+          port : 8063

@@ -4,6 +4,7 @@ import '../css/base.css';
 import {traversalStartLen, transfer, reverse} from './util';
 import $ from 'jquery';
 import Modal from './modal'
+
 /**
  * 批注组件,兼容IE9
  */
@@ -38,6 +39,7 @@ class FMark {
          */
         $(document).on('mousedown', function() {
             _this.mouseDownStartTime = Date.now();
+
             $(document).on('mousemove', function() {
                 _this.ifDrag = true;
             })
@@ -59,8 +61,37 @@ class FMark {
                         rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2
                     Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, selRange);
 
+<<<<<<< HEAD
                     //TODO 划线
                     _this.markLine(selRange);
+=======
+                    Modal.showMarkPopup(400, 400);
+                    let common_node = selRange.commonAncestorContainer;
+                    if(selRange.commonAncestorContainer.nodeType !== 1) {
+                        common_node = selRange.commonAncestorContainer.parentNode;
+                    }
+
+                    //需要储存的信息
+                    let currentRangeInfo = {
+                        start_index: traversalStartLen(selRange),
+                        text_length:  $.trim(selRange.toString()).length,
+                        common_tag: common_node.nodeName,
+                        tag_index: $(common_node).index(common_node.nodeName)
+                    }
+
+                    //起止文本在一个元素内
+                    if(selRange.startContainer == selRange.endContainer) {
+                        selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
+                    }else {
+                        //选中的文本是跨元素的,所以父级元素肯定有孩子元素
+                        transfer(currentRangeInfo);
+                    }
+
+                    //TODO 存本地调试
+                    _this.fmarkList.push(currentRangeInfo);
+                    console.log(_this.fmarkList);
+                    localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
+>>>>>>> dyw-dev
                 }
             }
             $(document).off('mousemove');
