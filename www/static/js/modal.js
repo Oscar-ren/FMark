@@ -7,7 +7,6 @@ class Modal {
 
 	onMakeIt(posX, posY, data) {
         //todo 点击mark it 的回调
-        console.log('aaa');
         this.hideMarkPopup();
         this.showMarkModal(posX, posY, data);
     }
@@ -18,7 +17,7 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note"><button class="note">Mark it!</button></li>'
+        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note">Mark it!</li>'
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
@@ -42,7 +41,7 @@ class Modal {
 
     	//修正的像素是为了尖角在所想的位置
         this.markModal.style.top = posY + 6 + 'px';
-        this.markModal.style.left = posX - 40  + 'px';
+        this.markModal.style.left = posX - 150  + 'px';
         this.markModal.style.display = 'block';
     }
     showMarkPopup(posX, posY, data) {
@@ -51,15 +50,14 @@ class Modal {
         }
         let _this = this;
         _this.markPopup.onclick = function() {
-        	console.log('bb')
             _this.onMakeIt(posX, posY, data);
         }
         //修正的像素是为了尖角在所想的位置
         this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 40  + 'px';
+        this.markPopup.style.left = posX - 38  + 'px';
         this.markPopup.style.display = 'block';
         setTimeout(function() {
-            _this.hideMarkPopup();
+            // _this.hideMarkPopup();
         }, 1000 * 4);
     }
     hideMarkPopup() {
