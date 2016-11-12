@@ -56,6 +56,20 @@ class FMark {
 
                 //选中区域有文字
                 if(selObj.toString()) {
+
+                    let common_node = selRange.commonAncestorContainer;
+                    if(selRange.commonAncestorContainer.nodeType !== 1) {
+                        common_node = selRange.commonAncestorContainer.parentNode;
+                    }
+
+                    //需要储存的信息
+                    let currentRangeInfo = {
+                        start_index: traversalStartLen(selRange),
+                        text_length:  $.trim(selRange.toString()).length,
+                        common_tag: common_node.nodeName,
+                        tag_index: $(common_node).index(common_node.nodeName)
+                    }
+
                     //吊起功能框
                     let rangeRect = selRange.getClientRects(),
                         rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2;
@@ -63,7 +77,7 @@ class FMark {
                     Modal.onMarkit(function() {
                         _this.markLine(selRange);
                     });
-                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, selRange);
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
 
                 }
             }
@@ -73,19 +87,6 @@ class FMark {
     }
     //划线
     markLine(selRange) {
-
-        let common_node = selRange.commonAncestorContainer;
-        if(selRange.commonAncestorContainer.nodeType !== 1) {
-            common_node = selRange.commonAncestorContainer.parentNode;
-        }
-
-        //需要储存的信息
-        let currentRangeInfo = {
-            start_index: traversalStartLen(selRange),
-            text_length:  $.trim(selRange.toString()).length,
-            common_tag: common_node.nodeName,
-            tag_index: $(common_node).index(common_node.nodeName)
-        }
 
         //起止文本在一个元素内
         if(selRange.startContainer == selRange.endContainer) {
