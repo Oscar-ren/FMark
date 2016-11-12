@@ -2,7 +2,17 @@ class Modal {
 	constructor() {
 		this.markPopup = undefined;
 		this.markModal = undefined;
-        this.host = 'http://localhost:8360';
+        this.host = 'http://www.fmark.com:8360';
+
+        let _this = this;
+
+        this.initMarkPopup();
+        this.initMarkModal();
+        window.addEventListener("message", function(e){ 
+            if (e.data == 'hideModal') {
+                _this.hideMarkModal();
+            }
+        }, false);
 	}
 
 	onMakeIt(posX, posY, data) {
@@ -29,7 +39,7 @@ class Modal {
         }
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
-        markModal.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div><iframe class="mark-iframe" src="'+_this.host+'/mark"></iframe>';
+        markModal.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div><iframe name="fmarkFrame" class="mark-iframe" src="'+_this.host+'/mark"></iframe>';
 
         document.body.appendChild(markModal);
         this.markModal = markModal;
@@ -38,11 +48,16 @@ class Modal {
     	if (!this.markModal) {
     		this.initMarkModal();
     	}
-
     	//修正的像素是为了尖角在所想的位置
         this.markModal.style.top = posY + 6 + 'px';
         this.markModal.style.left = posX - 150  + 'px';
         this.markModal.style.display = 'block';
+        setTimeout(function() {
+            fmarkFrame.window.postMessage(data, '*');
+        });
+    }
+    hideMarkModal() {
+        this.markModal && (this.markModal.style.display = 'none');
     }
     showMarkPopup(posX, posY, data) {
         if (!this.markPopup) {

@@ -4,6 +4,7 @@ import '../css/base.css';
 import {traversalStartLen, transfer, reverse} from './util';
 import $ from 'jquery';
 import Modal from './modal'
+
 /**
  * 批注组件,兼容IE9
  */
@@ -58,7 +59,7 @@ class FMark {
                 //选中区域有文字
                 if(selObj.toString()) {
 
-                    Modal.showMarkPopup(200, 100);
+                    Modal.showMarkPopup(400, 400);
                     let common_node = selRange.commonAncestorContainer;
                     if(selRange.commonAncestorContainer.nodeType !== 1) {
                         common_node = selRange.commonAncestorContainer.parentNode;
