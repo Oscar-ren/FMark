@@ -7,7 +7,9 @@
     border-radius: 6px;
     position: absolute;
     border: solid 1px #ccc;
+    background-color: #fff;
     margin: 0;
+    z-index: 10000;
     display: none;
 }
 .mark-it .mark-triangle {
@@ -34,6 +36,8 @@
     width: 300px;
     border: solid 1px #ccc;
     border-radius: 6px;
+    background-color: #fff;
+    z-index: 10000;
 }
 .mark-modal .mark-triangle {
     position: absolute;

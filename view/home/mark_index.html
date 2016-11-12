@@ -34,18 +34,23 @@
 	<textarea id="mark-content" placeholder="mark it"></textarea>
 	<p><button class="fmark-btn">Mark</button></p>
 	<script type="text/javascript">
-		var markData = undefined;
-		var content = document.getElementById('mark-content');
-		var close = document.getElementById('close');
+		;(function() {
+			var markData = undefined;
+			var content = document.getElementById('mark-content');
+			var close = document.getElementById('close');
 
-		close.onclick = function() {
-			window.parent.window.postMessage('hideModal', '*');
-		}
-		content.focus();
-		
-		window.addEventListener("message", function(e){
-    		console.log("Received message: ", e);
-    	}, false);
+			close.onclick = function() {
+				window.parent.window.postMessage({'code': 'hideModal'}, '*');
+			}
+			content.focus();
+			
+			window.addEventListener("message", function(e){
+	    		if (e.data.code == 'markdata') {
+	    			markdata = e.data.markdata;
+	    			console.log(markdata);
+	    		}
+	    	}, false);
+		})();
 	</script>
 </body>
 </html>

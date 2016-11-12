@@ -3,22 +3,24 @@ class Modal {
 		this.markPopup = undefined;
 		this.markModal = undefined;
         this.host = 'http://www.fmark.com:8360';
+        this.markCallback = undefined;
 
         let _this = this;
+
 
         this.initMarkPopup();
         this.initMarkModal();
         window.addEventListener("message", function(e){ 
-            if (e.data == 'hideModal') {
+            if (e.data.code == 'hideModal') {
                 _this.hideMarkModal();
+            } else if (e.data.code == 'markit') {
+                _this.hideMarkModal();
+                _this.markCallback.call(null, e.data.msg);
             }
         }, false);
 	}
-
-	onMakeIt(posX, posY, data) {
-        //todo 点击mark it 的回调
-        this.hideMarkPopup();
-        this.showMarkModal(posX, posY, data);
+    onMarkit(callback) {
+        this.markCallback = callback;
     }
     initMarkPopup() {
         let _this = this;
@@ -53,7 +55,7 @@ class Modal {
         this.markModal.style.left = posX - 150  + 'px';
         this.markModal.style.display = 'block';
         setTimeout(function() {
-            fmarkFrame.window.postMessage(data, '*');
+            fmarkFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
         });
     }
     hideMarkModal() {
@@ -65,15 +67,16 @@ class Modal {
         }
         let _this = this;
         _this.markPopup.onclick = function() {
-            _this.onMakeIt(posX, posY, data);
+            _this.hideMarkPopup();
+            _this.showMarkModal(posX, posY, data);
         }
         //修正的像素是为了尖角在所想的位置
         this.markPopup.style.top = posY + 6 + 'px';
         this.markPopup.style.left = posX - 38  + 'px';
         this.markPopup.style.display = 'block';
         setTimeout(function() {
-            // _this.hideMarkPopup();
-        }, 1000 * 4);
+            _this.hideMarkPopup();
+        }, 1000 * 6);
     }
     hideMarkPopup() {
         this.markPopup && (this.markPopup.style.display = 'none');
