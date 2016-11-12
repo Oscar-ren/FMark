@@ -3,7 +3,7 @@
 import '../css/base.css';
 import {traversalStartLen, transfer, reverse} from './util';
 import $ from 'jquery';
-
+import Modal from './modal'
 /**
  * 批注组件,兼容IE9
  */
@@ -16,63 +16,10 @@ class FMark {
         this.fmarkList = [];
         //标识,是否是mouseup事件后的点击事件
         this.isMouseUp = false;
-        this.markPopup = undefined;
-        this.host = 'http://localhost:8360';
+        
     }
 
     render() {}
-    onMakeIt(range, posX, posY) {
-        //todo 点击mark it 的回调
-
-        //点击后发送请求,成功后划线
-        let _this = this;
-        $('div').promise().then(function(result) {
-            console.log('promise resolve', result);
-            // _this.markLine(range);
-        }, function(err) {
-            console.log(err);
-        })
-
-        //TODO 存本地调试
-        // _this.fmarkList.push(currentRangeInfo);
-        // console.log(_this.fmarkList);
-        // localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
-
-        this.hideMarkPopup();
-    }
-    initMarkPopup() {
-        let _this = this;
-        let markPopup = document.createElement('ul');
-        markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note"><button class="note">Mark it!</button></li>'
-        
-        document.body.appendChild(markPopup);
-        this.markPopup = markPopup;
-    }
-    initMarkModal() {
-        let _this = this;
-        let markModal = document.createElement('div');
-        markModal.className = 'mark-modal';
-    }
-    showMarkPopup(range, posX, posY) {
-        if (!this.markPopup) {
-            this.initMarkPopup();
-        }
-        let _this = this;
-        _this.markPopup.onclick = function() {
-            _this.onMakeIt(range, posX, posY);
-        }
-        //修正的像素是为了尖角在所想的位置
-        this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 40  + 'px';
-        this.markPopup.style.display = 'block';
-        // setTimeout(function() {
-        //     _this.hideMarkPopup();
-        // }, 1000 * 4);
-    }
-    hideMarkPopup() {
-        this.markPopup && (this.markPopup.style.display = 'none');
-    }
     bindEvent() {
 
         let _this = this;
@@ -97,8 +44,7 @@ class FMark {
         })
 
         $(document).on('mouseup', function(e) {
-            _this.hideMarkPopup();
-
+            Modal.hideMarkPopup();
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && e.target !== $('html')[0]) {
@@ -111,7 +57,7 @@ class FMark {
                     //吊起功能框
                     let rangeRect = selRange.getClientRects(),
                         rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2
-                    _this.showMarkPopup(selRange, rangePosMiddle, rangeRect[rangeRect.length - 1].bottom);
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, selRange);
                 }
             }
             $(document).off('mousemove');
