@@ -67,7 +67,7 @@ class FMark {
         if(localStorage.getItem('fmark')) {
             let existList = JSON.parse(localStorage.getItem('fmark'));
             for(let i = 0; i < existList.length; i++) {
-                console.log(existList[i]);
+                // console.log(existList[i]);
                 // transfer(existList[i]);
             }
         }
@@ -91,10 +91,10 @@ class FMark {
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
 
-                console.log(selRange, selRange.commonAncestorContainer, selRange.commonAncestorContainer.nodeType,selRange.commonAncestorContainer.nodeName);
-
                 //选中区域有文字
                 if(selObj.toString()) {
+
+                    console.log(selRange, selRange.getClientRects(), '--------------');
 
                     let common_node = selRange.commonAncestorContainer;
                     if(selRange.commonAncestorContainer.nodeType !== 1) {
@@ -109,6 +109,9 @@ class FMark {
                         tag_index: $(common_node).index(common_node.nodeName)
                     }
 
+                    console.log(selRange.getClientRects()[0].right, selRange.getClientRects()[0].bottom);
+                    _this.showMarkPopup(selRange.getClientRects()[0].right, selRange.getClientRects()[0].bottom);
+
                     //起止文本在一个元素内
                     if(selRange.startContainer == selRange.endContainer) {
                         selRange.surroundContents($('<rxl class="rxl"></rxl>')[0]);
@@ -118,9 +121,9 @@ class FMark {
                     }
 
                     //TODO 存本地调试
-                    _this.fmarkList.push(currentRangeInfo);
-                    console.log(_this.fmarkList);
-                    localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
+                    // _this.fmarkList.push(currentRangeInfo);
+                    // console.log(_this.fmarkList);
+                    // localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
                 }
             }
             $(document).off('mousemove');
@@ -128,10 +131,10 @@ class FMark {
         })
 
 
-        $('.delete').on('click', function() {
-
-            reverse(_this.fmarkList[0]);
-        })
+        // $('.delete').on('click', function() {
+        //
+        //     reverse(_this.fmarkList[0]);
+        // })
     }
 }
 
