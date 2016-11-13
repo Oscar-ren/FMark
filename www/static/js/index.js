@@ -31,13 +31,8 @@ class FMark {
         let _this = this;
 
         //TODO 读数据
-        if(localStorage.getItem('fmark')) {
-            let existList = JSON.parse(localStorage.getItem('fmark'));
-            for(let i = 0; i < existList.length; i++) {
-                // console.log(existList[i]);
-                // transfer(existList[i]);
-            }
-        }
+        //request 根据返回数据中的type字段
+        //this.fmarkList 添加返回的数据
 
         /**
          * 保证只有拖拽下选择的文本才会输出
@@ -85,13 +80,6 @@ class FMark {
                         top: rangeRect[rangeRect.length - 1].top
                     }
 
-                    //吊起功能框
-                    // Modal.onMarkit(function() {
-                    //     let randomId = Math.random() * 100;
-                    //     _this.markLine(selRange, randomId);
-                    // });
-                    // Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
-
                     //划线功能
                     let markLine = (selRange, id) => {
                         //起止文本在一个元素内
@@ -105,22 +93,36 @@ class FMark {
                     };
 
 
-                    //TODO 划线,暂时使用假的id,每次发请求回来应该有一个id
+                    //TODO 划线 request,暂时使用假的id,每次发请求回来应该有一个id
                     let randomId = (Math.random() * 100).toFixed(2);
+                    currentRangeInfo.id = randomId;
                     // markLine(selRange, randomId);
 
-                    //计算选中文本最后一个字符宽度
-                    //TODO 这样的话要创建一个多余的dom用来计算,比较恶心
-                    var lastWordNode = document.getElementsByClassName('icon')[0];
-                    lastWordNode.innerHTML = selRange.toString().slice(-1);
+                    //吊起功能框
+                    // Modal.onMarkit(function() {
+                    //     let randomId = Math.random() * 100;
+                    //     _this.markLine(selRange, randomId);
+                    // });
+                    // Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
+
 
                     //添加评论小tip
-                    let tipTop = currentRangeInfo.top - 9,
-                        tipLeft = currentRangeInfo.right - lastWordNode.offsetWidth / 2 - 3.5;
-                    let noteDotNode = document.createElement('div');
-                    noteDotNode.setAttribute('data-id', randomId);
-                    noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
-                    document.getElementById('markings-layer').appendChild(noteDotNode);
+                    let addNoteTip = (currentRangeInfo) => {
+                        //计算选中文本最后一个字符宽度
+                        //TODO 这样的话要创建一个多余的dom用来计算,比较恶心
+                        var lastWordNode = document.getElementsByClassName('icon')[0];
+                        lastWordNode.innerHTML = currentRangeInfo.content.toString().slice(-1);
+
+                        let tipTop = currentRangeInfo.top - 9,
+                            tipLeft = currentRangeInfo.right - lastWordNode.offsetWidth / 2 - 3.5;
+                        let noteDotNode = document.createElement('div');
+                        //添加标识
+                        noteDotNode.setAttribute('data-id', currentRangeInfo.id);
+                        noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
+                        document.getElementById('markings-layer').appendChild(noteDotNode);
+                    }
+
+                    addNoteTip(currentRangeInfo);
 
                     _this.fmarkList[randomId] = $.extend(currentRangeInfo, {id: randomId});
                 }
