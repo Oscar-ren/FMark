@@ -50,7 +50,8 @@ let transfer = (info) => {
         startSearched = false,
         endSearched = false,
         //已查找长度
-        beginTextLen = 0;
+        beginTextLen = 0,
+        id = info.id;
 
     /**
      * 遍历节点渲染
@@ -64,8 +65,12 @@ let transfer = (info) => {
             if(beginTextLen + normalTextLen >= startIndex) {
                 startSearched = true;
                 currentNode.splitText(startIndex - beginTextLen);
-                //判断长度,初始节点不可能和结束节点在同一个dom上
-                changeNodeStyle(currentNode.nextSibling);
+                //考虑起始位置在同一个节点里
+                let nextSibling= currentNode.nextSibling;
+                if(nextSibling.nodeValue.length >= restTextLen) {
+                    nextSibling.splitText(restTextLen);
+                }
+                changeNodeStyle(nextSibling, id);
                 //找到了开头,下一个循环
                 return 1;
             }else {
@@ -80,13 +85,13 @@ let transfer = (info) => {
             //判断长度
             if (normalTextLen >= restTextLen) {
                 currentNode.splitText(restTextLen);
-                changeNodeStyle(currentNode);
+                changeNodeStyle(currentNode, id);
                 endSearched = true;
                 //全都找完了,退出
                 return 2;
             } else {
                 restTextLen -= normalTextLen;
-                changeNodeStyle(currentNode);
+                changeNodeStyle(currentNode, id);
             }
         }
 
@@ -103,10 +108,11 @@ let transfer = (info) => {
     /**
      * 改变选取区域样式
      */
-    let changeNodeStyle = (node) => {
+    let changeNodeStyle = (node, id) => {
         let par = node.parentNode;
         let spanEle = document.createElement('rxl');
         spanEle.setAttribute('class', 'rxl');
+        spanEle.setAttribute('data-id', id);
         spanEle.appendChild(node.cloneNode(false));
         //使用替换节点的方法
         par.replaceChild(spanEle, node);
@@ -124,10 +130,11 @@ let reverse = (info) => {
 
     let restTextLen = info.text_length,
         //第一次是公共父节点
-        ancestorNode = $(info.common_tag)[info.tag_index];
+        ancestorNode = $(info.common_tag)[info.tag_index],
+        id = info.id;
 
     let core = (node) => {
-        if(node.tagName == 'RXL') {
+        if(node.tagName == 'RXL' && node.getAttribute('data-id') == id) {
             if(node.childNodes) {
                 for(let i = 0; i < node.childNodes.length; i++) {
                     let result = core(node.childNodes[i]);
@@ -136,7 +143,11 @@ let reverse = (info) => {
                     }
                 }
             }
-            node.parentNode.replaceChild(document.createTextNode(node.cloneNode(true).innerHTML), node);
+            let fragment = document.createDocumentFragment();
+            for(let i = 0; i < node.childNodes.length; i++) {
+                fragment.appendChild(node.childNodes[i].cloneNode(true))
+            }
+            node.parentNode.replaceChild(fragment, node);
             restTextLen -= node.innerHTML.length;
             if(restTextLen == 0) {
                 return 2;
