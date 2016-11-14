@@ -73,11 +73,13 @@ class FMark {
                         tag_index: $(common_node).index(common_node.nodeName),
                         title: document.title,
                         url: location.href,
-                        content: selRange.toString(),
-                        right: rangeRect[rangeRect.length - 1].right,
-                        bottom: rangeRect[rangeRect.length - 1].bottom,
-                        left: rangeRect[rangeRect.length - 1].left,
-                        top: rangeRect[rangeRect.length - 1].top
+                        mark_content: selRange.toString(),
+                        position: {
+                            right: rangeRect[rangeRect.length - 1].right,
+                            bottom: rangeRect[rangeRect.length - 1].bottom,
+                            left: rangeRect[rangeRect.length - 1].left,
+                            top: rangeRect[rangeRect.length - 1].top
+                        }
                     }
 
                     //划线功能
@@ -113,8 +115,8 @@ class FMark {
                         var lastWordNode = document.getElementsByClassName('icon')[0];
                         lastWordNode.innerHTML = currentRangeInfo.content.toString().slice(-1);
 
-                        let tipTop = currentRangeInfo.top - 9,
-                            tipLeft = currentRangeInfo.right - lastWordNode.offsetWidth / 2 - 3.5;
+                        let tipTop = currentRangeInfo.position.top - 9,
+                            tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5;
                         let noteDotNode = document.createElement('div');
                         //添加标识
                         noteDotNode.setAttribute('data-id', currentRangeInfo.id);
