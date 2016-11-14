@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>underline</title>
+	<style type="text/css">
+		html,body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+		}
+		#underline {
+			display: block;
+			width: 100%;
+			height: 100%;
+			line-height: 36px;
+			text-align: center;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<span id="underline">underline</span>
+	<script type="text/javascript">
+		;(function() {
+			var markdata = undefined;
+			var underline = document.getElementById('underline');
+
+			underline.onclick = function() {
+				var data = makedata();
+
+				data += '&type=' + 1;
+
+				var xmlhttp;
+				if (window.XMLHttpRequest)
+				{// code for IE7+, Firefox, Chrome, Opera, Safari
+					xmlhttp=new XMLHttpRequest();
+				}
+				else
+				{// code for IE6, IE5
+					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status==200)
+					{
+						var res = JSON.parse(xmlhttp.responseText);
+						if (res.errno == 0) {
+							window.parent.window.postMessage({'code': 'underline','id':res.data}, '*');
+						}
+					} else {
+
+					}
+				}
+				xmlhttp.open("POST","/mark/add",true);
+				xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				xmlhttp.send(data);
+			}
+			window.addEventListener("message", function(e){
+	    		if (e.data.code == 'markdata') {
+	    			markdata = e.data.markdata;
+	    		}
+	    	}, false);
+
+			function makedata() {
+				var data = [];
+				for (var key in markdata) {
+					var temp = typeof markdata[key] == 'object'? JSON.stringify(markdata[key]) : markdata[key];
+					data.push(key + '=' + temp);
+				}
+				return data.join('&');
+			}
+		})();
+	</script>
+</body>
+</html>

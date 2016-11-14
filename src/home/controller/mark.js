@@ -11,6 +11,9 @@ export default class extends Base {
     //auto render template file index_index.html
     return this.display();
   }
+  underlineAction() {
+  	return this.display();
+  }
   async addAction() {
   	let data = this.post();
 
