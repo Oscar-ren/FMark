@@ -30,18 +30,23 @@
 	</style>
 </head>
 <body>
-	<p class="fmark-info"><span class="info">The FMark mark the best!</span><span id="close">X</span></p>
+	<p class="fmark-info"><span class="info">The FMark mark the best!</span><span id="close-btn">X</span></p>
 	<textarea id="mark-content" placeholder="mark it"></textarea>
-	<p><button class="fmark-btn">Mark</button></p>
+	<p><button class="fmark-btn" id="mark-btn">Mark</button></p>
 	<script type="text/javascript">
 		;(function() {
 			var markData = undefined;
 			var content = document.getElementById('mark-content');
-			var close = document.getElementById('close');
+			var close = document.getElementById('close-btn');
+			var markBtn = document.getElementById('mark-btn');
 
 			close.onclick = function() {
 				window.parent.window.postMessage({'code': 'hideModal'}, '*');
 			}
+			markBtn.onclick = function() {
+				
+			}
+
 			content.focus();
 			
 			window.addEventListener("message", function(e){
@@ -50,6 +55,8 @@
 	    			console.log(markdata);
 	    		}
 	    	}, false);
+
+
 		})();
 	</script>
 </body>

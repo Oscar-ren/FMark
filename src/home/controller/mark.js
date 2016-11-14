@@ -14,7 +14,7 @@ export default class extends Base {
   async addAction() {
   	let data  = this.post();
 
-  	let res = await think.model('ct').add(data);
+  	let res = await this.model('ct').addMark(data);
   	return this.success(res);
   }
 }
