@@ -19,7 +19,7 @@
 		p {
 			padding: 4px 0;
 		}
-		#close {
+		#close-btn {
 			float: right;
 			margin-right: 8px;
 			cursor: pointer;
@@ -30,26 +30,69 @@
 	</style>
 </head>
 <body>
-	<p class="fmark-info"><span class="info">The FMark mark the best!</span><span id="close">X</span></p>
+	<p class="fmark-info"><span class="info">The FMark mark the best!</span><span id="close-btn">X</span></p>
 	<textarea id="mark-content" placeholder="mark it"></textarea>
-	<p><button class="fmark-btn">Mark</button></p>
+	<p><button class="fmark-btn" id="mark-btn">Mark</button></p>
 	<script type="text/javascript">
 		;(function() {
 			var markData = undefined;
 			var content = document.getElementById('mark-content');
-			var close = document.getElementById('close');
+			var close = document.getElementById('close-btn');
+			var markBtn = document.getElementById('mark-btn');
 
 			close.onclick = function() {
 				window.parent.window.postMessage({'code': 'hideModal'}, '*');
 			}
+			markBtn.onclick = function() {
+				if (content.value) {
+					var data = makedata();
+					data += '&mark_content=' + content.value;
+
+					data += '&type=' + 2;
+
+					var xmlhttp;
+					if (window.XMLHttpRequest)
+					{// code for IE7+, Firefox, Chrome, Opera, Safari
+						xmlhttp=new XMLHttpRequest();
+					}
+					else
+					{// code for IE6, IE5
+						xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					xmlhttp.onreadystatechange = function() {
+						if (xmlhttp.readyState == 4 && xmlhttp.status==200)
+						{
+							var res = JSON.parse(xmlhttp.responseText);
+							if (res.errno == 0) {
+								window.parent.window.postMessage({'code': 'markit','msg':content.value,'id':res.data}, '*');
+							}
+						} else {
+
+						}
+					}
+					xmlhttp.open("POST","/mark/add",true);
+					xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+				}
+				
+			}
+
 			content.focus();
 			
 			window.addEventListener("message", function(e){
 	    		if (e.data.code == 'markdata') {
 	    			markdata = e.data.markdata;
-	    			console.log(markdata);
 	    		}
 	    	}, false);
+
+			function makedata() {
+				var data = [];
+				for (var key in markdata) {
+					var temp = typeof markdata[key] == 'object'? JSON.stringify(markdata[key]) : markdata[key];
+					data.push(key + '=' + temp);
+				}
+				return data.join('&');
+			}
 		})();
 	</script>
 </body>

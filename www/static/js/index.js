@@ -53,7 +53,6 @@ class FMark {
 
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
-
                 //选中区域有文字
                 if(selObj.toString()) {
 
@@ -100,12 +99,12 @@ class FMark {
                     currentRangeInfo.id = randomId;
                     // markLine(selRange, randomId);
 
-                    //吊起功能框
-                    // Modal.onMarkit(function() {
-                    //     let randomId = Math.random() * 100;
-                    //     _this.markLine(selRange, randomId);
-                    // });
-                    // Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
+                    // 吊起功能框
+                    Modal.onMarkit(function(id, msg) {
+                        let randomId = Math.random() * 100;
+                        markLine(selRange, randomId);
+                    });
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
 
 
                     //添加评论小tip

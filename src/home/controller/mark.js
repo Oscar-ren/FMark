@@ -11,10 +11,13 @@ export default class extends Base {
     //auto render template file index_index.html
     return this.display();
   }
+  underlineAction() {
+  	return this.display();
+  }
   async addAction() {
-  	let data  = this.post();
+  	let data = this.post();
 
-  	let res = await think.model('ct').add(data);
+  	let res = await this.model('ct').addMark(data);
   	return this.success(res);
   }
 }

@@ -15,7 +15,11 @@ class Modal {
                 _this.hideMarkModal();
             } else if (e.data.code == 'markit') {
                 _this.hideMarkModal();
-                _this.markCallback.call(null, e.data.msg);
+                _this.markCallback.call(null, e.data.id, e.data.msg);
+            } else if (e.data.code == 'underline') {
+                _this.hideMarkPopup();
+                _this.markCallback.call(null, e.data.id);
+                console.log('fefef')
             }
         }, false);
 	}
@@ -29,7 +33,7 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note">Mark it!</li>'
+        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note"><iframe name="underlineFrame" class="mark-iframe" src="'+_this.host+'/mark/underline"></iframe></li><li class="mark-note">Mark it!</li>'
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
@@ -54,9 +58,7 @@ class Modal {
         this.markModal.style.top = posY + 6 + 'px';
         this.markModal.style.left = posX - 150  + 'px';
         this.markModal.style.display = 'block';
-        setTimeout(function() {
-            fmarkFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
-        });
+        fmarkFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
     }
     hideMarkModal() {
         this.markModal && (this.markModal.style.display = 'none');
@@ -72,10 +74,11 @@ class Modal {
         }
         //修正的像素是为了尖角在所想的位置
         this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 38  + 'px';
+        this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';
+        underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
         setTimeout(function() {
-            _this.hideMarkPopup();
+            // _this.hideMarkPopup();
         }, 1000 * 6);
     }
     hideMarkPopup() {
