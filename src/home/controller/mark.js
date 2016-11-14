@@ -14,10 +14,22 @@ export default class extends Base {
   underlineAction() {
   	return this.display();
   }
+  commentAction() {
+    return this.display();
+  }
   async addAction() {
   	let data = this.post();
-
-  	let res = await this.model('ct').addMark(data);
-  	return this.success(res);
+    let comment_id;
+    if (data['comment_id']) {
+      
+    } else {
+      let comment_id = await this.model('ct').addComment(data);
+  	}
+    if (comment_id) {
+      await this.model('ct').addDiscuss(data);
+    } else {
+      return this.error('error');
+    }
+    return this.success(comment_id);
   }
 }
