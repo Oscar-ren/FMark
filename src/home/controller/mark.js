@@ -12,7 +12,7 @@ export default class extends Base {
     return this.display();
   }
   async addAction() {
-  	let data  = this.post();
+  	let data = this.post();
 
   	let res = await this.model('ct').addMark(data);
   	return this.success(res);

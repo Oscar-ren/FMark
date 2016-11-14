@@ -15,7 +15,7 @@ class Modal {
                 _this.hideMarkModal();
             } else if (e.data.code == 'markit') {
                 _this.hideMarkModal();
-                _this.markCallback.call(null, e.data.msg);
+                _this.markCallback.call(null, e.data.id, e.data.msg);
             }
         }, false);
 	}

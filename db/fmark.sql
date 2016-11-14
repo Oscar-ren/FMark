@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50626
 File Encoding         : 65001
 
-Date: 2016-11-14 10:04:21
+Date: 2016-11-14 12:13:03
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -33,15 +33,18 @@ CREATE TABLE `mark_coment` (
 DROP TABLE IF EXISTS `mark_ct`;
 CREATE TABLE `mark_ct` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
+  `type` int(2) DEFAULT NULL COMMENT '1为underline，2为mark',
+  `name` varchar(15) DEFAULT NULL,
   `article_content` varchar(255) DEFAULT NULL,
   `mark_content` varchar(255) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `key` varchar(20) DEFAULT NULL,
-  `createtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `thumbs` int(11) unsigned NOT NULL DEFAULT '0',
+  `createtime` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for mark_user
