@@ -25,7 +25,7 @@ export default class extends Base {
       comment_id = data['comment_id'];
     } else {
       data['createtime'] = createtime;
-      let comment_id = await this.model('comment').addComment(data);
+      comment_id = await this.model('comment').addComment(data);
   	}
     if (data.type == 1) {
       return this.success(comment_id);
@@ -34,8 +34,9 @@ export default class extends Base {
     let discuss = JSON.parse( data['discuss'] );
     discuss['createtime'] = createtime;
     discuss['comment_id'] = comment_id;
+    console.log(discuss);
     await this.model('comment').addDiscuss(discuss);
-    
+
     return this.success(comment_id);
   }
   async getcommentAction() {

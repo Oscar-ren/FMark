@@ -101,7 +101,11 @@ class FMark {
 
                     // 吊起功能框
                     Modal.onMarkit(function(id, msg) {
-                        markLine(selRange, id);
+                        if (msg) {
+                            addNoteTip(currentRangeInfo);
+                        } else {
+                            markLine(selRange, id);
+                        }
                         _this.fmarkList[id] = $.extend(currentRangeInfo, {id: id});
                     });
                     Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
@@ -123,7 +127,6 @@ class FMark {
                         document.getElementById('markings-layer').appendChild(noteDotNode);
                     }
 
-                    addNoteTip(currentRangeInfo);
 
                 }
             }
