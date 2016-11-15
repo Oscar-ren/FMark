@@ -46,7 +46,10 @@
 			markBtn.onclick = function() {
 				if (content.value) {
 					var data = makedata();
-					data += '&mark_content=' + content.value;
+					var discuss = {
+						discuss_content: content.value
+					}
+					data += '&discuss=' + JSON.stringify(discuss);
 
 					data += '&type=' + 2;
 

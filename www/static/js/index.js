@@ -66,14 +66,14 @@ class FMark {
 
                     //需要储存的信息
                     let currentRangeInfo = {
-                        start_index: traversalStartLen(selRange),
-                        text_length:  $.trim(selRange.toString()).length,
-                        common_tag: common_node.nodeName,
-                        tag_index: $(common_node).index(common_node.nodeName),
                         title: document.title,
                         url: location.href,
-                        mark_content: selRange.toString(),
+                        article_content: selRange.toString(),
                         position: {
+                            start_index: traversalStartLen(selRange),
+                            text_length:  $.trim(selRange.toString()).length,
+                            common_tag: common_node.nodeName,
+                            tag_index: $(common_node).index(common_node.nodeName),
                             right: rangeRect[rangeRect.length - 1].right,
                             bottom: rangeRect[rangeRect.length - 1].bottom,
                             left: rangeRect[rangeRect.length - 1].left,
@@ -95,14 +95,14 @@ class FMark {
 
 
                     //TODO 划线 request,暂时使用假的id,每次发请求回来应该有一个id
-                    let randomId = (Math.random() * 100).toFixed(2);
-                    currentRangeInfo.id = randomId;
+                    // let randomId = (Math.random() * 100).toFixed(2);
+                    // currentRangeInfo.id = randomId;
                     // markLine(selRange, randomId);
 
                     // 吊起功能框
                     Modal.onMarkit(function(id, msg) {
-                        let randomId = Math.random() * 100;
-                        markLine(selRange, randomId);
+                        markLine(selRange, id);
+                        _this.fmarkList[id] = $.extend(currentRangeInfo, {id: id});
                     });
                     Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
 
@@ -112,7 +112,7 @@ class FMark {
                         //计算选中文本最后一个字符宽度
                         //TODO 这样的话要创建一个多余的dom用来计算,比较恶心
                         var lastWordNode = document.getElementsByClassName('icon')[0];
-                        lastWordNode.innerHTML = currentRangeInfo.content.toString().slice(-1);
+                        lastWordNode.innerHTML = currentRangeInfo.article_content.toString().slice(-1);
 
                         let tipTop = currentRangeInfo.position.top - 9,
                             tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5;
@@ -125,7 +125,6 @@ class FMark {
 
                     addNoteTip(currentRangeInfo);
 
-                    _this.fmarkList[randomId] = $.extend(currentRangeInfo, {id: randomId});
                 }
             }
             $(document).off('mousemove');
