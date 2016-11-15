@@ -112,7 +112,7 @@ class FMark {
                         //计算选中文本最后一个字符宽度
                         //TODO 这样的话要创建一个多余的dom用来计算,比较恶心
                         var lastWordNode = document.getElementsByClassName('icon')[0];
-                        lastWordNode.innerHTML = currentRangeInfo.content.toString().slice(-1);
+                        lastWordNode.innerHTML = currentRangeInfo.mark_content.toString().slice(-1);
 
                         let tipTop = currentRangeInfo.position.top - 9,
                             tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5;
