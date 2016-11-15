@@ -19,17 +19,31 @@ export default class extends Base {
   }
   async addAction() {
   	let data = this.post();
+    let createtime = Date.now();
     let comment_id;
     if (data['comment_id']) {
-      
+      comment_id = data['comment_id'];
     } else {
-      let comment_id = await this.model('ct').addComment(data);
+      data['createtime'] = createtime;
+      let comment_id = await this.model('comment').addComment(data);
   	}
-    if (comment_id) {
-      await this.model('ct').addDiscuss(data);
-    } else {
-      return this.error('error');
+    if (data.type == 1) {
+      return this.success(comment_id);
     }
+
+    let discuss = JSON.parse( data['discuss'] );
+    discuss['createtime'] = createtime;
+    discuss['comment_id'] = comment_id;
+    await this.model('comment').addDiscuss(discuss);
+    
     return this.success(comment_id);
+  }
+  async getcommentAction() {
+    let url = this.post('url');
+    let title = this.post('title');
+
+    let data = await this.model('comment').getComment(url, title);
+
+    return this.success(data);
   }
 }
