@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>message</title>
+</head>
+<body>
+	<script type="text/javascript">
+		;(function() {
+			function sendPost(data, url, callback) {
+				var xmlhttp;
+				if (window.XMLHttpRequest) {
+					// code for IE7+, Firefox, Chrome, Opera, Safari
+					xmlhttp=new XMLHttpRequest();
+				} else {
+					// code for IE6, IE5
+					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status==200) {
+						var res = JSON.parse(xmlhttp.responseText);
+						callback(res);
+					} else {
+
+					}
+					
+				};
+
+				xmlhttp.open("POST", url, true);
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xmlhttp.send(data);
+			}
+			function sendmsg(code, data) {
+				window.parent.window.postMessage({'code': code,'data': data}, '*');
+			}
+			window.addEventListener("message", function(e){
+				let markdata;
+	    		if (e.data.code == 'underline') {
+	    			markdata = e.data.markdata;
+	    			markdata += '&type=' + 1;
+
+	    			sendPost(markdata, '/mark/add', function(res) {
+						if (res.errno == 0) {
+							sendmsg('underline', {'id':res.data});
+						}
+	    			});
+	    		}
+	    	}, false);
+		})()
+	</script>
+</body>
+</html>

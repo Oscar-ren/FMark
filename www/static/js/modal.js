@@ -10,6 +10,7 @@ class Modal {
 
         this.initMarkPopup();
         this.initMarkModal();
+        this.initHidenIframe();
         window.addEventListener("message", function(e){ 
             if (e.data.code == 'hideModal') {
                 _this.hideMarkModal();
@@ -18,11 +19,18 @@ class Modal {
                 _this.markCallback.call(null, e.data.id, e.data.msg);
             } else if (e.data.code == 'underline') {
                 _this.hideMarkPopup();
-                _this.markCallback.call(null, e.data.id);
-                console.log('fefef')
+                _this.markCallback.call(null, e.data.data.id);
             }
         }, false);
 	}
+    makedata(markdata) {
+        var data = [];
+        for (var key in markdata) {
+            var temp = typeof markdata[key] == 'object'? JSON.stringify(markdata[key]) : markdata[key];
+            data.push(key + '=' + temp);
+        }
+        return data.join('&');
+    }
     onMarkit(callback) {
         this.markCallback = callback;
     }
@@ -33,7 +41,7 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note"><iframe name="underlineFrame" class="mark-iframe" src="'+_this.host+'/mark/underline"></iframe></li><li class="mark-note">Mark it!</li>'
+        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note underline">underline</li><li class="mark-note markit">Mark it!</li>'
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
@@ -49,6 +57,14 @@ class Modal {
 
         document.body.appendChild(markModal);
         this.markModal = markModal;
+    }
+    initHidenIframe() {
+        let iframe = document.createElement('iframe');
+        iframe.src = this.host + '/mark/iframe';
+        iframe.style.display = 'none';
+        iframe.name = 'messageIframe';
+
+        document.body.appendChild(iframe);
     }
     showMarkModal(posX, posY, data) {
     	if (!this.markModal) {
@@ -68,15 +84,22 @@ class Modal {
             this.initMarkPopup();
         }
         let _this = this;
-        _this.markPopup.onclick = function() {
+        _this.markPopup.onclick = function(ev) {
             _this.hideMarkPopup();
-            _this.showMarkModal(posX, posY, data);
+
+            let targetClass = ev.target.className;
+            if (targetClass.indexOf('underline') > -1) {
+                messageIframe.window.postMessage({'code':'underline','markdata':_this.makedata(data)}, '*');
+            } else if (targetClass.indexOf('markit') > -1) {
+                _this.showMarkModal(posX, posY, data);
+            }
+            // _this.showMarkModal(posX, posY, data);
         }
         //修正的像素是为了尖角在所想的位置
         this.markPopup.style.top = posY + 6 + 'px';
         this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';
-        underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
+        // underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
         setTimeout(function() {
             // _this.hideMarkPopup();
         }, 1000 * 6);

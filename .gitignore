@@ -30,7 +30,7 @@ dist/
 # output
 output/
 output.tar.gz
-
+sftp-config.json
 app/
 
 runtime/
