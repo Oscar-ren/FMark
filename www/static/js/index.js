@@ -10,7 +10,6 @@ import {EventUtil, getAjax} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
 import querystring from 'querystring';
-import $ from 'jquery';
 
 /**
  * 批注组件,兼容IE9
@@ -24,6 +23,7 @@ class FMark {
         this.fmarkList = {};
         //当前显示的评论id
         this.currentNoteId = '';
+        this.host = 'http://www.fmark.com:8360';
     }
 
     render() {}
@@ -41,13 +41,14 @@ class FMark {
             title: document.title,
             url: location.href
         };
-        jsonp('http://www.fmark.com:8360/mark/getcomment?' + querystring.encode(param), function(err, result) {
+        jsonp( _this.host + '/mark/getcomment?' + querystring.encode(param), function(err, result) {
             for(let key in result) {
                 result[key].position = JSON.parse(result[key].position);
                 _this.fmarkList[result[key].id] = result[key];
                 if(result[key].type == 2) {
                     _this.addNoteTip(result[key], result[key].id);
                 }else {
+                    //TODO 其他人的划线样式不一样
                     _this.markLine(result[key], result[key].id);
                 }
             }
