@@ -40,11 +40,11 @@ export default class extends Base {
     return this.success(comment_id);
   }
   async getcommentAction() {
-    let url = this.post('url');
-    let title = this.post('title');
+    let url = this.get('url');
+    let title = this.get('title');
 
     let data = await this.model('comment').getComment(url, title);
 
-    return this.success(data);
+    return this.jsonp(data);
   }
 }

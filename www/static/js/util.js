@@ -11,6 +11,10 @@ let traversalStartLen = (selRange) => {
         startIndex = 0,
         finalFlag = false;
 
+    if(selRange.commonAncestorContainer.nodeType !== 1) {
+        node = selRange.commonAncestorContainer.parentNode;
+    }
+
     let core = (node) => {
         if(finalFlag) return 2;
         if(node.nodeType == 3) {
@@ -41,11 +45,11 @@ let traversalStartLen = (selRange) => {
  */
 let transfer = (info) => {
 
-    let startIndex = info.start_index,
+    let startIndex = info.position.start_index,
         //剩余长度
-        restTextLen = info.text_length,
+        restTextLen = info.position.text_length,
         //第一次是公共父节点
-        ancestorNode = $(info.common_tag)[info.tag_index],
+        ancestorNode = document.getElementsByTagName(info.position.common_tag)[info.position.tag_index],
         //起止游标
         startSearched = false,
         endSearched = false,
@@ -110,15 +114,17 @@ let transfer = (info) => {
      */
     let changeNodeStyle = (node, id) => {
         let par = node.parentNode;
-        let spanEle = document.createElement('rxl');
-        spanEle.setAttribute('class', 'rxl');
+        let spanEle = document.createElement('fm');
+        spanEle.setAttribute('class', 'fmark');
         spanEle.setAttribute('data-id', id);
         spanEle.appendChild(node.cloneNode(false));
         //使用替换节点的方法
         par.replaceChild(spanEle, node);
     }
 
-    traversalRender(ancestorNode);
+    if(ancestorNode) {
+        traversalRender(ancestorNode);
+    }
 
 }
 
@@ -128,13 +134,15 @@ let transfer = (info) => {
  */
 let reverse = (info) => {
 
-    let restTextLen = info.text_length,
+    console.log(info);
+
+    let restTextLen = info.position.text_length,
         //第一次是公共父节点
-        ancestorNode = $(info.common_tag)[info.tag_index],
+        ancestorNode = document.getElementsByTagName(info.position.common_tag)[info.position.tag_index],
         id = info.id;
 
     let core = (node) => {
-        if(node.tagName == 'RXL' && node.getAttribute('data-id') == id) {
+        if(node.tagName == 'FM' && node.getAttribute('data-id') == id) {
             if(node.childNodes) {
                 for(let i = 0; i < node.childNodes.length; i++) {
                     let result = core(node.childNodes[i]);
@@ -164,6 +172,5 @@ let reverse = (info) => {
     }
     core(ancestorNode);
 }
-
 
 export {traversalStartLen, transfer, reverse};

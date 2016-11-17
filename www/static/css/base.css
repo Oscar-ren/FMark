@@ -1,5 +1,8 @@
-.rxl {
-    text-decoration: underline;
+.fmark {
+    border-bottom: 2px solid #a0a0a0;
+}
+.fmark-hide {
+    display: none;
 }
 .mark-it {
     list-style: none;

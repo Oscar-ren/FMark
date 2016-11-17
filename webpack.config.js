@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+// require("expose?FMark!./www/static/js/index.js");
 
 module.exports = {
     entry: './www/static/js/index.js',

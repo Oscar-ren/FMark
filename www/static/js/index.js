@@ -6,8 +6,11 @@
 
 import '../css/base.css';
 import {traversalStartLen, transfer, reverse} from './util';
+import {EventUtil, getAjax} from './base';
+import Modal from './modal';
+import jsonp from 'jsonp';
+import querystring from 'querystring';
 import $ from 'jquery';
-import Modal from './modal'
 
 /**
  * 批注组件,兼容IE9
@@ -19,10 +22,8 @@ class FMark {
         this.mouseDownStartTime = Date.now();
         //序列,储存划线信息数组
         this.fmarkList = {};
-        //标识,是否是mouseup事件后的点击事件
-        this.isMouseUp = false;
+        //当前显示的评论id
         this.currentNoteId = '';
-        
     }
 
     render() {}
@@ -30,26 +31,46 @@ class FMark {
 
         let _this = this;
 
+        //评论tip容器
+        let markLayer = document.createElement('div');
+        markLayer.setAttribute('id', 'markings-layer');
+        document.body.appendChild(markLayer);
+
         //TODO 读数据
-        //request 根据返回数据中的type字段
-        //this.fmarkList 添加返回的数据
+        let param = {
+            title: document.title,
+            url: location.href
+        };
+        jsonp('http://www.fmark.com:8360/mark/getcomment?' + querystring.encode(param), function(err, result) {
+            for(let key in result) {
+                result[key].position = JSON.parse(result[key].position);
+                _this.fmarkList[result[key].id] = result[key];
+                if(result[key].type == 2) {
+                    _this.addNoteTip(result[key], result[key].id);
+                }else {
+                    _this.markLine(result[key], result[key].id);
+                }
+            }
+        });
 
         /**
          * 保证只有拖拽下选择的文本才会输出
          */
-        $(document).on('mousedown', function() {
+        EventUtil.addHandler(document, 'mousedown', function() {
             _this.mouseDownStartTime = Date.now();
 
-            $(document).on('mousemove', function() {
+            EventUtil.addHandler(document, 'mousemove', function() {
                 _this.ifDrag = true;
             })
         })
 
-        $(document).on('mouseup', function(e) {
+        EventUtil.addHandler(document, 'mouseup', function(e) {
+            e = EventUtil.getEvent(e);
+            let target = EventUtil.getTarget(e);
             Modal.hideMarkPopup();
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
-            if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && e.target !== $('html')[0]) {
+            if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && target !== document.getElementsByTagName('html')[0]) {
 
                 let selObj = window.getSelection(),
                     selRange = selObj.getRangeAt(0);
@@ -60,8 +81,11 @@ class FMark {
                     if(selRange.commonAncestorContainer.nodeType !== 1) {
                         common_node = selRange.commonAncestorContainer.parentNode;
                     }
-
-                    let rangeRect = selRange.getClientRects(),
+                    let tag_index = Array.from(document.getElementsByTagName(common_node.nodeName)).findIndex(function(value, index, arr) {
+                        return value == common_node;
+                    }),
+                        //选取区域的位置
+                        rangeRect = selRange.getClientRects(),
                         rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2;
 
                     //需要储存的信息
@@ -71,9 +95,9 @@ class FMark {
                         article_content: selRange.toString(),
                         position: {
                             start_index: traversalStartLen(selRange),
-                            text_length:  $.trim(selRange.toString()).length,
+                            text_length: selRange.toString().trim().length,
                             common_tag: common_node.nodeName,
-                            tag_index: $(common_node).index(common_node.nodeName),
+                            tag_index: tag_index,
                             right: rangeRect[rangeRect.length - 1].right,
                             bottom: rangeRect[rangeRect.length - 1].bottom,
                             left: rangeRect[rangeRect.length - 1].left,
@@ -81,76 +105,45 @@ class FMark {
                         }
                     }
 
-                    //划线功能
-                    let markLine = (selRange, id) => {
-                        //起止文本在一个元素内
-                        if(selRange.startContainer == selRange.endContainer) {
-                            selRange.surroundContents($('<rxl class="rxl" data-id="' + id + '"></rxl>')[0]);
-                        }else {
-                            //TODO 可以只用这个
-                            //选中的文本是跨元素的,所以父级元素肯定有孩子元素
-                            transfer($.extend(currentRangeInfo, {id: id, type: 'underline'}));
-                        }
-                    };
-
-
-                    //TODO 划线 request,暂时使用假的id,每次发请求回来应该有一个id
-                    // let randomId = (Math.random() * 100).toFixed(2);
-                    // currentRangeInfo.id = randomId;
-                    // markLine(selRange, randomId);
-
                     // 吊起功能框
                     Modal.onMarkit(function(id, msg) {
                         if (msg) {
-                            addNoteTip(currentRangeInfo);
+                            _this.addNoteTip(currentRangeInfo, id);
                         } else {
-                            markLine(selRange, id);
+                            _this.markLine(currentRangeInfo, id);
                         }
-                        _this.fmarkList[id] = $.extend(currentRangeInfo, {id: id});
+                        _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id});
                     });
+                    console.log('showMarkPopup', currentRangeInfo);
                     Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
-
-
-                    //添加评论小tip
-                    let addNoteTip = (currentRangeInfo) => {
-                        //计算选中文本最后一个字符宽度
-                        //TODO 这样的话要创建一个多余的dom用来计算,比较恶心
-                        var lastWordNode = document.getElementsByClassName('icon')[0];
-                        lastWordNode.innerHTML = currentRangeInfo.article_content.toString().slice(-1);
-
-                        let tipTop = currentRangeInfo.position.top - 9,
-                            tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5;
-                        let noteDotNode = document.createElement('div');
-                        //添加标识
-                        noteDotNode.setAttribute('data-id', currentRangeInfo.id);
-                        noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
-                        document.getElementById('markings-layer').appendChild(noteDotNode);
-                    }
-
-
                 }
             }
-            $(document).off('mousemove');
+            EventUtil.removeHandler(document, 'mousemove');
             _this.ifDrag = false;
         })
 
         //点击划线事件
-        document.addEventListener('click',function(e) {
+        EventUtil.addHandler(document, 'click',function(e) {
+            e = EventUtil.getEvent(e);
+            let target = EventUtil.getTarget(e);
 
             //点击划线区域可选删除
-            if(e.target && e.target.nodeName.toUpperCase() == 'RXL') {
+            if(target && target.nodeName.toUpperCase() == 'FM') {
                 //删除逻辑
                 //TODO delete request
-                let currentRangeId = e.target.dataset.id;
+                let currentRangeId = target.dataset.id;
+                console.log(currentRangeId, _this.fmarkList);
                 reverse(_this.fmarkList[currentRangeId]);
+                delete _this.fmarkList[currentRangeId];
+                localStorage.setItem('fmark', JSON.stringify(_this.fmarkList));
 
             //点击评论tip显示划线
-            }else if(e.target && e.target.getAttribute('class') == 'note-dot') {
+            }else if(target && target.getAttribute('class') == 'note-dot') {
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])
                 }
                 //取当前range的id
-                let noteId = e.target.parentNode.dataset.id;
+                let noteId = target.parentNode.dataset.id;
                 _this.currentNoteId = noteId;
                 //TODO 显示划线,弹出评论框
                 transfer(_this.fmarkList[noteId]);
@@ -158,10 +151,30 @@ class FMark {
             }else if(_this.currentNoteId) {
                 reverse(_this.fmarkList[_this.currentNoteId])
             }
-        }, false)
+        })
     }
+
+    //添加评论小tip功能
+    addNoteTip(currentRangeInfo, id) {
+        //计算选中文本最后一个字符宽度
+        var lastWordNode = document.createElement('span');
+        lastWordNode.setAttribute('class', 'fmark-hide');
+        lastWordNode.innerHTML = currentRangeInfo.article_content.toString().slice(-1);
+        document.body.appendChild(lastWordNode);
+
+        let tipTop = currentRangeInfo.position.top - 9,
+            tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5,
+            noteDotNode = document.createElement('div');
+        //添加标识
+        noteDotNode.setAttribute('data-id', id);
+        noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
+        document.getElementById('markings-layer').appendChild(noteDotNode);
+    }
+    //划线功能
+    markLine(currentRangeInfo, id) {
+        transfer(Object.assign(currentRangeInfo, {id: id}));
+    }
+
 }
 
-
-let mark = new FMark();
-mark.bindEvent();
+window.FMark = FMark;
