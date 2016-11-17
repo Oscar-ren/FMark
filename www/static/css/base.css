@@ -1,5 +1,8 @@
-.fmark {
+.fmark_underline {
     border-bottom: 2px solid #a0a0a0;
+}
+.fmark_note {
+    border-bottom: 2px solid #daadda;
 }
 .fmark-hide {
     display: none;
