@@ -1,14 +1,13 @@
 class Modal {
 	constructor() {
 		this.markPopup = undefined;
-		this.markModal = undefined;
+        this.markModal = undefined;
+		this.markComment = undefined;
         this.host = 'http://www.fmark.com:8360';
         this.markCallback = undefined;
 
         let _this = this;
 
-
-        this.initMarkPopup();
         this.initMarkModal();
         this.initHidenIframe();
         window.addEventListener("message", function(e){ 
@@ -65,6 +64,13 @@ class Modal {
         iframe.name = 'messageIframe';
 
         document.body.appendChild(iframe);
+    }
+    initMarkComment() {
+        let _this = this;
+        if (_this.markComment) {
+            return;
+        }
+        let markComment = document.createElement('div');
     }
     showMarkModal(posX, posY, data) {
     	if (!this.markModal) {
