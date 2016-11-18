@@ -1,4 +1,5 @@
 import {defered, getChildbyClass} from './util';
+
 class Modal {
 	constructor() {
 		this.markPopup = undefined;
@@ -60,7 +61,7 @@ class Modal {
             } else if (targetClass.indexOf('fmark-btn') > -1) {
                 if (markContent.value) {
                     _this.hideMarkModal();
-                    _this.popupDefer.resolve({code: 'mark', data: markContent.value});
+                    _this.popupDefer.resolve({code: 'mark', msg: markContent.value});
                 }
             }
         }
@@ -125,9 +126,9 @@ class Modal {
         this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';
         // underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
-        setTimeout(function() {
-            _this.hideMarkPopup();
-        }, 1000 * 6);
+        // setTimeout(function() {
+        //     _this.hideMarkPopup();
+        // }, 1000 * 6);
         return defer.promise;
     }
     hideMarkPopup(hasResolve) {
