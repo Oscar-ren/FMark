@@ -5,38 +5,11 @@ class Modal {
         this.popupDefer = undefined;
         this.markModal = undefined;
 		this.markComment = undefined;
-        this.host = 'http://www.fmark.com:8360';
         this.markCallback = undefined;
         this.marking = false;
 
-        // let _this = this;
-
-        // this.initMarkModal();
-        // this.initHidenIframe();
-        // window.addEventListener("message", function(e){ 
-        //     if (e.data.code == 'hideModal') {
-        //         _this.hideMarkModal();
-        //     } else if (e.data.code == 'markit') {
-        //         _this.hideMarkModal();
-        //         _this.markCallback.call(null, e.data.id, e.data.msg);
-        //     } else if (e.data.code == 'underline') {
-        //         _this.hideMarkPopup();
-        //         _this.markCallback.call(null, e.data.data.id);
-        //     }
-        // }, false);
+        this.host = 'http://www.fmark.com:8360';
 	}
-    initMarkPopup() {
-        let _this = this;
-        if (_this.markPopup) {
-        	return;
-        }
-        let markPopup = document.createElement('ul');
-        markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note cansel-underline">取消划线</li><li class="mark-note make-underline">划线</li><li class="mark-note markit">批注</li>'
-        
-        document.body.appendChild(markPopup);
-        this.markPopup = markPopup;
-    }
     initMarkModal() {
         let _this = this;
         if (_this.markModal) {
@@ -66,21 +39,6 @@ class Modal {
         }
         this.markModal = markModal;
     }
-    // initHidenIframe() {
-    //     let iframe = document.createElement('iframe');
-    //     iframe.src = this.host + '/mark/iframe';
-    //     iframe.style.display = 'none';
-    //     iframe.name = 'messageIframe';
-
-    //     document.body.appendChild(iframe);
-    // }
-    initMarkComment() {
-        let _this = this;
-        if (_this.markComment) {
-            return;
-        }
-        let markComment = document.createElement('div');
-    }
     showMarkModal(posX, posY) {
     	if (!this.markModal) {
     		this.initMarkModal();
@@ -95,6 +53,46 @@ class Modal {
     }
     hideMarkModal() {
         this.markModal && (this.markModal.style.display = 'none');
+    }
+    initMarkComment(id) {
+        let _this = this;
+        if (_this.markComment) {
+            this.commentIframe.src = this.host + '/mark/comment?id=' + id;
+            return;
+        }
+        let markComment = document.createElement('div');
+        markComment.className = 'mark-comment'
+        markComment.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div>';
+        let commentIframe = document.createElement('iframe');
+        commentIframe.className = 'comment-iframe';
+        commentIframe.src = this.host + '/mark/comment?id=' + id;
+        markComment.appendChild(commentIframe);
+        document.body.appendChild(markComment);
+
+        this.markComment = markComment;
+        this.commentIframe = commentIframe;
+    }
+    showMarkComment(posX, posY, id) {
+        this.initMarkComment(id);
+
+        this.markComment.style.top = posY + 6 + 'px';
+        this.markComment.style.left = posX - 85  + 'px';
+        this.markComment.style.display = 'block';
+    }
+    hideMarkComment() {
+        this.markComment && (this.markComment.style.display = 'none');
+    }
+    initMarkPopup() {
+        let _this = this;
+        if (_this.markPopup) {
+            return;
+        }
+        let markPopup = document.createElement('ul');
+        markPopup.className = 'mark-it';
+        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note cansel-underline">取消划线</li><li class="mark-note make-underline">划线</li><li class="mark-note markit">批注</li>'
+        
+        document.body.appendChild(markPopup);
+        this.markPopup = markPopup;
     }
     showMarkPopup(posX, posY, hasline) {
         if (!this.markPopup) {
@@ -115,7 +113,6 @@ class Modal {
                 _this.showMarkModal(posX, posY);
                 _this.marking = true;
             }
-            // _this.showMarkModal(posX, posY, data);
         }
         //修正的像素是为了尖角在所想的位置
         if (hasline) {

@@ -10,7 +10,7 @@ import {EventUtil, getAjax} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
 import querystring from 'querystring';
-
+window.Modal = Modal;
 /**
  * 批注组件,兼容IE9
  */
@@ -117,7 +117,7 @@ class FMark {
                     //     }
                     // });
                     console.log('showMarkPopup', currentRangeInfo);
-                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, true).then(function() {
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom).then(function() {
                         console.log(arguments, 'resolve');
                     }, function() {
                         console.log(arguments, 'reject');
