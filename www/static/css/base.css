@@ -136,8 +136,9 @@ body.hide-all-lines .fmark-underline {
     top: 1px;
     left: -7px;
 }
-.mark-comment .comment-iframe {
-    border: none;
+.mark-comment .comment-ul {
+    margin: 0;
+    list-style: none;
 }
 .note-dot {
     position: absolute;

@@ -9,7 +9,6 @@ import jsonp from 'jsonp';
  * 批注组件,兼容IE9
  */
 class FMark {
-
     constructor() {
         this.ifDrag = false;
         this.mouseDownStartTime = Date.now();

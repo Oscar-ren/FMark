@@ -39,6 +39,12 @@ export default class extends Base {
 
     return this.jsonp(comment_id);
   }
+  async getdiscussAction() {
+    let comment_id = this.get('id');
+    let data = await this.model('comment').getDiscussbyId(comment_id);
+
+    return this.jsonp(data);
+  }
   async getcommentAction() {
     let url = this.get('url');
     let title = this.get('title');
