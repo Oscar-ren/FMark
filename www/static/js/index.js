@@ -1,7 +1,3 @@
-/**
- *
- */
-
 'use strict';
 
 import '../css/base.css';
@@ -27,6 +23,14 @@ class FMark {
     render() {}
     bindEvent() {
 
+        //TODO 设置cookie,过期时间为1天
+        var _date = new Date();
+        _date.setDate(_date.getDate()+30);
+        var _cookie = {
+            
+        }
+        document.cookie = "fmark=value;expires=date";
+
         let _this = this;
 
         //评论tip容器
@@ -34,7 +38,7 @@ class FMark {
         markLayer.setAttribute('id', 'markings-layer');
         document.body.appendChild(markLayer);
 
-        //TODO 读数据
+        //读数据
         let param = {
             title: document.title,
             url: location.href
@@ -197,9 +201,10 @@ class FMark {
         }
         lastWordNode.innerHTML = currentRangeInfo.article_content.toString().slice(-1);
 
-        let tipTop = currentRangeInfo.position.top - 9,
+        let tipTop = currentRangeInfo.position.top - 10,
             tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5,
             noteDotNode = document.createElement('div');
+
         //添加标识
         noteDotNode.setAttribute('data-id', currentRangeInfo.id);
         noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';

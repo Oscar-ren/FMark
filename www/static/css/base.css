@@ -3,7 +3,7 @@ body.hide-all-lines .fmark-underline {
 }
 
 /*怎么给划线加动画*/
-.fmark-underline {
+.fmark-underline, .fmark-note {
     border-bottom: 2px solid #adadad;
     /*background: linear-gradient(gray, gray) no-repeat;*/
     /*background-size: 100% 2px;*/
@@ -11,11 +11,9 @@ body.hide-all-lines .fmark-underline {
     /*text-shadow: .05em 0 white, -.05em 0 white;*/
     /*transition: background-color 1s;*/
 }
-.fmark-note {
-    border-bottom: 2px solid #adadad;
-}
+
 .fmark-hide {
-    display: none;
+    visibility: hidden;
 }
 .mark-it {
     list-style: none;
