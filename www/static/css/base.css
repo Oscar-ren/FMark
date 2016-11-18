@@ -1,5 +1,18 @@
-.fmark {
-    border-bottom: 2px solid #a0a0a0;
+body.hide-all-lines .fmark-underline {
+    border-width: 0;
+}
+
+/*怎么给划线加动画*/
+.fmark-underline {
+    border-bottom: 2px solid #adadad;
+    /*background: linear-gradient(gray, gray) no-repeat;*/
+    /*background-size: 100% 2px;*/
+    /*background-position: 0 1.02em;*/
+    /*text-shadow: .05em 0 white, -.05em 0 white;*/
+    /*transition: background-color 1s;*/
+}
+.fmark-note {
+    border-bottom: 2px solid #adadad;
 }
 .fmark-hide {
     display: none;

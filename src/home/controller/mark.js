@@ -50,4 +50,11 @@ export default class extends Base {
 
     return this.jsonp(data);
   }
+  async deletecommentAction() {
+    let id = this.get('id');
+
+    let data = await this.model('comment').deleteComment(id);
+
+    return this.jsonp(data);
+  }
 }

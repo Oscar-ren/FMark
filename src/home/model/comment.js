@@ -17,6 +17,13 @@ export default class extends think.model.base {
 	getMarkbyId(id) {
 		
 	}
+	deleteComment(id) {
+		let model = this.model("comment");
+
+		return model.where({
+			id: id
+		}).delete();
+	}
 	getComment(url, title) {
 		let model = this.model("comment");
 

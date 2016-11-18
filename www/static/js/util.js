@@ -55,7 +55,8 @@ let transfer = (info) => {
         endSearched = false,
         //已查找长度
         beginTextLen = 0,
-        id = info.id;
+        id = info.id,
+        type = info.type;
 
     /**
      * 遍历节点渲染
@@ -74,7 +75,7 @@ let transfer = (info) => {
                 if(nextSibling.nodeValue.length >= restTextLen) {
                     nextSibling.splitText(restTextLen);
                 }
-                changeNodeStyle(nextSibling, id);
+                changeNodeStyle(nextSibling, id, type);
                 //找到了开头,下一个循环
                 return 1;
             }else {
@@ -89,13 +90,13 @@ let transfer = (info) => {
             //判断长度
             if (normalTextLen >= restTextLen) {
                 currentNode.splitText(restTextLen);
-                changeNodeStyle(currentNode, id);
+                changeNodeStyle(currentNode, id, type);
                 endSearched = true;
                 //全都找完了,退出
                 return 2;
             } else {
                 restTextLen -= normalTextLen;
-                changeNodeStyle(currentNode, id);
+                changeNodeStyle(currentNode, id, type);
             }
         }
 
@@ -112,10 +113,14 @@ let transfer = (info) => {
     /**
      * 改变选取区域样式
      */
-    let changeNodeStyle = (node, id) => {
+    let changeNodeStyle = (node, id, type) => {
         let par = node.parentNode;
         let spanEle = document.createElement('fm');
-        spanEle.setAttribute('class', 'fmark');
+        if(type == 1) {
+            spanEle.setAttribute('class', 'fmark-underline');
+        }else {
+            spanEle.setAttribute('class', 'fmark-note');
+        }
         spanEle.setAttribute('data-id', id);
         spanEle.appendChild(node.cloneNode(false));
         //使用替换节点的方法
@@ -133,8 +138,6 @@ let transfer = (info) => {
  * @param info
  */
 let reverse = (info) => {
-
-    console.log(info);
 
     let restTextLen = info.position.text_length,
         //第一次是公共父节点
