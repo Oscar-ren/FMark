@@ -175,5 +175,52 @@ let reverse = (info) => {
     }
     core(ancestorNode);
 }
-
-export {traversalStartLen, transfer, reverse};
+/**
+ * 获取延迟对象
+ * @param 
+ */
+let defered = () => {
+    let defer = {};
+    defer.promise = new Promise(function(resolve, reject) {
+        defer.resolve = function(data) {
+            resolve(data);
+        }
+        defer.reject = function(data) {
+            reject(data);
+        }
+    });
+    return defer;
+}
+/**
+ * 把对象转为ajax数据
+ * @param 对象
+ */
+let makeAjaxData = (markdata) => {
+    var data = [];
+    for (var key in markdata) {
+        var temp = typeof markdata[key] == 'object'? JSON.stringify(markdata[key]) : markdata[key];
+        data.push(key + '=' + temp);
+    }
+    return data.join('&');
+}
+/**
+ * 把对象转为ajax数据
+ * @param className
+ */
+let getChildbyClass = (node, className) => {
+    let children = node.childNodes;
+    if (!children.length) {
+        return false;
+    }
+    for (let index = 0; index < children.length; index++) {
+        if (children[index].className && children[index].className.indexOf(className) > -1) {
+            return children[index];
+        }
+        let temp = getChildbyClass(children[index], className);
+        if (temp) {
+            return temp;
+        }
+    }
+    return false;
+}
+export {traversalStartLen, transfer, reverse, defered, makeAjaxData, getChildbyClass};

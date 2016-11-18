@@ -107,17 +107,21 @@ class FMark {
                     }
 
                     // 吊起功能框
-                    Modal.onMarkit(function(id, msg) {
-                        if (msg) {
-                            _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 2});
-                            _this.addNoteTip(_this.fmarkList[id]);
-                        } else {
-                            _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 1});
-                            _this.markLine(_this.fmarkList[id]);
-                        }
-                    });
+                    // Modal.onMarkit(function(id, msg) {
+                    //     if (msg) {
+                    //         _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 2});
+                    //         _this.addNoteTip(_this.fmarkList[id]);
+                    //     } else {
+                    //         _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 1});
+                    //         _this.markLine(_this.fmarkList[id]);
+                    //     }
+                    // });
                     console.log('showMarkPopup', currentRangeInfo);
-                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, currentRangeInfo);
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom, true).then(function() {
+                        console.log(arguments, 'resolve');
+                    }, function() {
+                        console.log(arguments, 'reject');
+                    });
                 }
             }
             EventUtil.removeHandler(document, 'mousemove');
