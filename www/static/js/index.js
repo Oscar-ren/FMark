@@ -1,21 +1,18 @@
 /**
- * 最后做,去掉jquery,目前有些代码使用原生写的,有点乱
+ *
  */
 
 'use strict';
 
 import '../css/base.css';
-import {traversalStartLen, transfer, reverse} from './util';
-import {EventUtil, getAjax} from './base';
+import {traversalStartLen, transfer, reverse, makeAjaxData} from './util';
+import {EventUtil} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
-import querystring from 'querystring';
-window.Modal = Modal;
 /**
  * 批注组件,兼容IE9
  */
 class FMark {
-
     constructor() {
         this.ifDrag = false;
         this.mouseDownStartTime = Date.now();
@@ -41,7 +38,7 @@ class FMark {
             title: document.title,
             url: location.href
         };
-        jsonp( _this.host + '/mark/getcomment?' + querystring.encode(param), function(err, result) {
+        jsonp( _this.host + '/mark/getcomment?' + makeAjaxData(param), function(err, result) {
             for(let key in result) {
                 result[key].position = JSON.parse(result[key].position);
                 _this.fmarkList[result[key].id] = result[key];
@@ -106,21 +103,26 @@ class FMark {
                         }
                     }
 
-                    // 吊起功能框
-                    // Modal.onMarkit(function(id, msg) {
-                    //     if (msg) {
-                    //         _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 2});
-                    //         _this.addNoteTip(_this.fmarkList[id]);
-                    //     } else {
-                    //         _this.fmarkList[id] = Object.assign(currentRangeInfo, {id: id, type: 1});
-                    //         _this.markLine(_this.fmarkList[id]);
-                    //     }
-                    // });
-                    console.log('showMarkPopup', currentRangeInfo);
-                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom).then(function() {
-                        console.log(arguments, 'resolve');
-                    }, function() {
-                        console.log(arguments, 'reject');
+                    //新数据
+                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom).then(function(data) {
+                        //划线和评论请求格式一样
+                        let param = '';
+                        if(data.code == 'underline') {
+                            param = Object.assign(currentRangeInfo, {type: 1});
+                        }else if(data.code == 'mark') {
+                            param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg});
+                        }
+                        jsonp( _this.host + '/mark/add?' + makeAjaxData(param), function(err, id) {
+                            _this.fmarkList[id] = Object.assign(param, {id: id});
+                            if(param.type == 1) {
+                                _this.markLine(_this.fmarkList[id]);
+
+                            }else {
+                                _this.addNoteTip(_this.fmarkList[id]);
+                            }
+                        });
+                    }, function(err) {
+                        console.log(err, 'reject');
                     });
                 }
             }
@@ -133,19 +135,32 @@ class FMark {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
 
+            //点划线弹窗
             if(target && target.nodeName.toUpperCase() == 'FM') {
                 let rangeInfo = _this.fmarkList[target.dataset.id];
 
                 //删除划线
-                if(rangeInfo.type == 1) {
-                    jsonp( _this.host + '/mark/deletecomment?' + querystring.encode({id: target.dataset.id}),
-                        function(err, result) {
-                            let currentRangeId = target.dataset.id;
-                            reverse(_this.fmarkList[currentRangeId]);
-                            delete _this.fmarkList[currentRangeId];
-                        }
-                    );
-                }
+                Modal.showMarkPopup((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, true).then(function(data) {
+                    if(data.code == 'del-underline') {
+                        jsonp( _this.host + '/mark/deletecomment?' + makeAjaxData({id: target.dataset.id}),
+                            function(err, result) {
+                                console.log(result);
+                                let currentRangeId = target.dataset.id;
+                                reverse(_this.fmarkList[currentRangeId]);
+                                delete _this.fmarkList[currentRangeId];
+                            }
+                        );
+                    }
+                    if(data.code == 'mark') {
+                        let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg});
+                        jsonp( _this.host + '/mark/add?' + makeAjaxData(param), function(err, id) {
+                            _this.fmarkList[id] = Object.assign(param, {id: id});
+                            _this.addNoteTip(_this.fmarkList[id]);
+                        });
+                    }
+                }, function(err) {
+                    console.log(err, 'reject');
+                });
 
             //点击评论tip显示划线
             }else if(target && target.getAttribute('class') == 'note-dot') {
@@ -154,11 +169,15 @@ class FMark {
                 }
                 document.body.classList.add('hide-all-lines');
                 //取当前range的id
-                let noteId = target.parentNode.dataset.id;
+                let noteId = target.parentNode.dataset.id,
+                    rangeInfo = _this.fmarkList[noteId];
+
                 _this.currentNoteId = noteId;
                 //TODO 显示划线,弹出评论框
-                _this.markLine(_this.fmarkList[noteId]);
+                Modal.showMarkModal((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom)
+                _this.markLine(rangeInfo);
 
+            //点其他地方隐藏当前存储的已显示的评论的划线
             }else if(_this.currentNoteId) {
                 document.body.classList.remove('hide-all-lines');
                 reverse(_this.fmarkList[_this.currentNoteId])
@@ -169,10 +188,13 @@ class FMark {
     //添加评论小tip功能
     addNoteTip(currentRangeInfo) {
         //计算选中文本最后一个字符宽度
-        var lastWordNode = document.createElement('span');
-        lastWordNode.setAttribute('class', 'fmark-hide');
+        let lastWordNode = document.getElementsByClassName('fmark-hide')[0];
+        if(!lastWordNode) {
+            lastWordNode = document.createElement('span');
+            lastWordNode.setAttribute('class', 'fmark-hide');
+            document.body.appendChild(lastWordNode);
+        }
         lastWordNode.innerHTML = currentRangeInfo.article_content.toString().slice(-1);
-        document.body.appendChild(lastWordNode);
 
         let tipTop = currentRangeInfo.position.top - 9,
             tipLeft = currentRangeInfo.position.right - lastWordNode.offsetWidth / 2 - 3.5,

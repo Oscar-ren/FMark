@@ -18,7 +18,7 @@ export default class extends Base {
     return this.display();
   }
   async addAction() {
-  	let data = this.post();
+  	let data = this.get();
     let createtime = Date.now();
     let comment_id;
     if (data['comment_id']) {
@@ -28,16 +28,16 @@ export default class extends Base {
       comment_id = await this.model('comment').addComment(data);
   	}
     if (data.type == 1) {
-      return this.success(comment_id);
+      return this.jsonp(comment_id);
     }
 
-    let discuss = JSON.parse( data['discuss'] );
+    let discuss = {};
+    discuss['discuss_content'] = data['discuss_content'];
     discuss['createtime'] = createtime;
     discuss['comment_id'] = comment_id;
-    console.log(discuss);
     await this.model('comment').addDiscuss(discuss);
 
-    return this.success(comment_id);
+    return this.jsonp(comment_id);
   }
   async getdiscussAction() {
     let comment_id = this.get('id');
