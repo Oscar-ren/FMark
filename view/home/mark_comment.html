@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>comment</title>
+	<style type="text/css">
+		.discuss-ul {
+			list-style: none;
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<ul class="discuss-ul">
+	<% discuss.forEach(function(item) { %>
+		<li>
+			<p><%= item.name%> 的批注</p>
+			<p><%= item.discuss_content%></p>
+			<p><span>赞</span></p>
+		</li>
+	<% }) %>
+	</ul>
+</body>
+</html>

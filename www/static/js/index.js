@@ -9,7 +9,6 @@ import {traversalStartLen, transfer, reverse, makeAjaxData} from './util';
 import {EventUtil} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
-
 /**
  * 批注组件,兼容IE9
  */

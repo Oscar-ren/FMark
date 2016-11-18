@@ -14,8 +14,12 @@ export default class extends think.model.base {
 		data['thumbs'] = 0;
 		return model.add(data);
 	}
-	getMarkbyId(id) {
-		
+	getDiscussbyId(id) {
+		let model = this.model("discuss");
+
+		return model.where({
+			comment_id: id
+		}).select();
 	}
 	deleteComment(id) {
 		let model = this.model("comment");
