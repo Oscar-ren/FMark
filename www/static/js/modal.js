@@ -1,4 +1,6 @@
 import {defered, getChildbyClass} from './util';
+import jsonp from 'jsonp';
+import querystring from 'querystring';
 class Modal {
 	constructor() {
 		this.markPopup = undefined;
@@ -57,20 +59,35 @@ class Modal {
     initMarkComment(id) {
         let _this = this;
         if (_this.markComment) {
-            this.commentIframe.src = this.host + '/mark/comment?id=' + id;
-            return;
-        }
-        let markComment = document.createElement('div');
-        markComment.className = 'mark-comment'
-        markComment.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div>';
-        let commentIframe = document.createElement('iframe');
-        commentIframe.className = 'comment-iframe';
-        commentIframe.src = this.host + '/mark/comment?id=' + id;
-        markComment.appendChild(commentIframe);
-        document.body.appendChild(markComment);
+            
+        } else {
+            let markComment = document.createElement('div');
+            markComment.className = 'mark-comment'
+            markComment.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div>';
+            let commentWrap = document.createElement('div');
+            commentWrap.className = 'comment-iframe';
+            markComment.appendChild(commentWrap);
+            document.body.appendChild(markComment);
 
-        this.markComment = markComment;
-        this.commentIframe = commentIframe;
+            this.markComment = markComment;
+            this.commentWrap = commentWrap;
+        }
+        // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
+        jsonp(_this.host+'/mark/getdiscuss?id='+id, function(err, result) {
+            console.log(err, result);
+            let html = '<ul class="comment-ul">';
+            if (result.length) {
+                for (let index = 0; index < result.length; index++) {
+                    let item = result[index];
+                    html += '<li>';
+                    html += '<p>' + item.name + ' 的批注</p>';
+                    html += '<p>' + item.discuss_content + '</p>';
+                    html += '<p><span>赞</span></p>';
+                }
+            }
+            html += '</ul>';
+            _this.commentWrap.innerHTML = html;
+        });
     }
     showMarkComment(posX, posY, id) {
         this.initMarkComment(id);

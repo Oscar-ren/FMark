@@ -192,19 +192,7 @@ let defered = () => {
     return defer;
 }
 /**
- * 把对象转为ajax数据
- * @param 对象
- */
-let makeAjaxData = (markdata) => {
-    var data = [];
-    for (var key in markdata) {
-        var temp = typeof markdata[key] == 'object'? JSON.stringify(markdata[key]) : markdata[key];
-        data.push(key + '=' + temp);
-    }
-    return data.join('&');
-}
-/**
- * 把对象转为ajax数据
+ * 或去节点的子元素
  * @param className
  */
 let getChildbyClass = (node, className) => {
@@ -223,4 +211,4 @@ let getChildbyClass = (node, className) => {
     }
     return false;
 }
-export {traversalStartLen, transfer, reverse, defered, makeAjaxData, getChildbyClass};
+export {traversalStartLen, transfer, reverse, defered, getChildbyClass};
