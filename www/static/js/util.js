@@ -117,9 +117,9 @@ let transfer = (info) => {
         let par = node.parentNode;
         let spanEle = document.createElement('fm');
         if(type == 1) {
-            spanEle.setAttribute('class', 'fmark_underline');
+            spanEle.setAttribute('class', 'fmark-underline');
         }else {
-            spanEle.setAttribute('class', 'fmark_note');
+            spanEle.setAttribute('class', 'fmark-note');
         }
         spanEle.setAttribute('data-id', id);
         spanEle.appendChild(node.cloneNode(false));

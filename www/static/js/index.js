@@ -129,27 +129,26 @@ class FMark {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
 
-            //点击划线区域可选删除
-            if(target && target.getAttribute('class') == 'fmark_underline') {
-                //删除逻辑
-                //TODO delete request
+            if(target && target.nodeName.toUpperCase() == 'FM') {
+                let rangeInfo = _this.fmarkList[target.dataset.id];
 
-                jsonp( _this.host + '/mark/deletecomment?' + querystring.encode({id: target.dataset.id}),
-                    function(err, result) {
-                        console.log(result);
-                        let currentRangeId = target.dataset.id;
-                        reverse(_this.fmarkList[currentRangeId]);
-                        delete _this.fmarkList[currentRangeId];
-                    }
-                );
-
-
+                //删除划线
+                if(rangeInfo.type == 1) {
+                    jsonp( _this.host + '/mark/deletecomment?' + querystring.encode({id: target.dataset.id}),
+                        function(err, result) {
+                            let currentRangeId = target.dataset.id;
+                            reverse(_this.fmarkList[currentRangeId]);
+                            delete _this.fmarkList[currentRangeId];
+                        }
+                    );
+                }
 
             //点击评论tip显示划线
             }else if(target && target.getAttribute('class') == 'note-dot') {
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])
                 }
+                document.body.classList.add('hide-all-lines');
                 //取当前range的id
                 let noteId = target.parentNode.dataset.id;
                 _this.currentNoteId = noteId;
@@ -157,6 +156,7 @@ class FMark {
                 _this.markLine(_this.fmarkList[noteId]);
 
             }else if(_this.currentNoteId) {
+                document.body.classList.remove('hide-all-lines');
                 reverse(_this.fmarkList[_this.currentNoteId])
             }
         })
