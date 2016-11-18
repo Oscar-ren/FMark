@@ -15,6 +15,15 @@
     z-index: 10000;
     display: none;
 }
+.mark-it .cansel-underline {
+    display: none;
+}
+.mark-it.hasline .cansel-underline {
+    display: block !important;
+}
+.mark-it.hasline .make-underline {
+    display: none !important;
+}
 .mark-it .mark-triangle {
     position: absolute;
     display: block;

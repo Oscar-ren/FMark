@@ -40,7 +40,7 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note underline">underline</li><li class="mark-note markit">Mark it!</li>'
+        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note cansel-underline">取消划线</li><li class="mark-note make-underline">划线</li><li class="mark-note markit">批注</li>'
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
@@ -85,7 +85,7 @@ class Modal {
     hideMarkModal() {
         this.markModal && (this.markModal.style.display = 'none');
     }
-    showMarkPopup(posX, posY, data) {
+    showMarkPopup(posX, posY, data, hasline) {
         if (!this.markPopup) {
             this.initMarkPopup();
         }
@@ -94,14 +94,19 @@ class Modal {
             _this.hideMarkPopup();
 
             let targetClass = ev.target.className;
-            if (targetClass.indexOf('underline') > -1) {
+            if (targetClass.indexOf('make-underline') > -1) {
                 messageIframe.window.postMessage({'code':'underline','markdata':_this.makedata(data)}, '*');
+            } else if (targetClass.indexOf('cnasel-underline') > -1) {
+                messageIframe.window.postMessage({'code':'cansel-underline','markdata':_this.makedata(data)}, '*');
             } else if (targetClass.indexOf('markit') > -1) {
                 _this.showMarkModal(posX, posY, data);
             }
             // _this.showMarkModal(posX, posY, data);
         }
         //修正的像素是为了尖角在所想的位置
+        if (hasline) {
+            this.markPopup.className = 'mark-it hasline';
+        }
         this.markPopup.style.top = posY + 6 + 'px';
         this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';

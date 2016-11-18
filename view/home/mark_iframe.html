@@ -35,6 +35,7 @@
 			}
 			window.addEventListener("message", function(e){
 				let markdata;
+				console.log(e);
 	    		if (e.data.code == 'underline') {
 	    			markdata = e.data.markdata;
 	    			markdata += '&type=' + 1;
