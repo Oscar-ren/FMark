@@ -95,8 +95,10 @@ class FMark {
                     //需要储存的信息
                     let currentRangeInfo = {
                         title: document.title,
+                        host: location.hostname,
                         url: location.href,
                         article_content: selRange.toString(),
+                        discuss: [],
                         position: {
                             start_index: traversalStartLen(selRange),
                             text_length: selRange.toString().trim().length,
@@ -123,7 +125,7 @@ class FMark {
                         }else if(data.code == 'mark') {
                             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
-                                _this.fmarkList[id] = Object.assign(param, {id: id});
+                                _this.fmarkList[id] = Object.assign(param, {id: id, discuss_content: data.msg, name: data.name});
                                 _this.addNoteTip(_this.fmarkList[id]);
                             });
                         }
