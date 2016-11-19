@@ -62,7 +62,7 @@ class Modal {
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
-    initMarkComment(id) {
+    initMarkComment(data) {
         let _this = this;
         if (_this.markComment) {
             
@@ -79,32 +79,30 @@ class Modal {
             this.commentWrap = commentWrap;
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
-        jsonp(_this.host+'/mark/getdiscuss?id='+id, function(err, result) {
-            console.log(err, result);
-            let html = '';
-            if (result.length) {
-                html += '<ul class="comment-ul">';
-                for (let index = 0; index < result.length; index++) {
-                    let item = result[index];
-                    html += '<li>';
-                    html += '<p>' + item.name + ' 的批注</p>';
-                    html += '<p>' + item.discuss_content + '</p>';
-                    html += '<p><span>赞</span></p>';
-                }
-                html += '</ul>';
-
-                if (result.length > 1) {
-
-                    html += '<p class="comment-page">';
-                    html += '<span class="now">1</span>/<span class="all"></span>'
-                    html += '</p>';
-                }
+       
+        let html = '';
+        if (data.length) {
+            html += '<ul class="comment-ul">';
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index];
+                html += '<li>';
+                html += '<p class="comment-p">' + item.name + ' 的批注</p>';
+                html += '<p class="comment-p">' + item.discuss_content + '</p>';
+                html += '<p class="comment-p"><span>赞</span></p>';
             }
-            _this.commentWrap.innerHTML = html;
-        });
+            html += '</ul>';
+
+            if (data.length > 1) {
+
+                html += '<p class="comment-page">';
+                html += '<span class="now">1</span>/<span class="all">'+data.length+'</span>'
+                html += '</p>';
+            }
+        }
+        _this.commentWrap.innerHTML = html;
     }
-    showMarkComment(posX, posY, id) {
-        this.initMarkComment(id);
+    showMarkComment(posX, posY, data) {
+        this.initMarkComment(data);
 
         this.markComment.style.top = posY + 6 + 'px';
         this.markComment.style.left = posX - 85  + 'px';
