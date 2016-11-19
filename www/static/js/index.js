@@ -140,6 +140,7 @@ class FMark {
         EventUtil.addHandler(document, 'click',function(e) {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
+            Modal.hideMarkModal(target);
             if(!Modal.hideMarkComment(target)) return;
 
             //点划线弹窗
