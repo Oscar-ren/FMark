@@ -20,10 +20,12 @@ class Modal {
         }
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
-        markModal.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div><div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
-            '<p><input class="mark-name" placeholder="显示名称"/></p>' +
-            '<textarea class="mark-content" placeholder="mark it"></textarea>' +
-            '<p><button class="fmark-btn" id="mark-btn">Mark</button></p></div>';
+        markModal.innerHTML = `<div class="mark-triangle"><i class="triangle"></i></div>
+                               <div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
+                                    <p><input class="mark-name" placeholder="显示名称"/></p>
+                                    <textarea class="mark-content" placeholder="mark it"></textarea>
+                                    <p><button class="fmark-btn" id="mark-btn">Mark</button></p>
+                                </div>`;
 
         document.body.appendChild(markModal);
 
@@ -85,21 +87,33 @@ class Modal {
             html += '<ul class="comment-ul">';
             for (let index = 0; index < data.length; index++) {
                 let item = data[index];
-                html += '<li>';
-                html += '<p class="comment-p">' + item.name + ' 的批注</p>';
-                html += '<p class="comment-p">' + item.discuss_content + '</p>';
-                html += '<p class="comment-p"><span>赞</span></p>';
+                html += `<li>
+                            <p class="comment-p">${item.name} 的批注</p>
+                            <p class="comment-p">${item.discuss_content}</p>
+                            <p class="comment-p"><span class="thumbs" comment_id="${item.comment_id}">${item.thumbs || ''}赞</span></p>
+                        </li>`;
             }
             html += '</ul>';
 
             if (data.length > 1) {
 
-                html += '<p class="comment-page">';
-                html += '<span class="now">1</span>/<span class="all">'+data.length+'</span>'
-                html += '</p>';
+                html += `<p class="comment-page">;
+                            <span class="now">1</span>/<span class="all">${data.length}</span>
+                        </p>`;
             }
         }
         _this.commentWrap.innerHTML = html;
+        _this.commentWrap.onclick = function(e) {
+            let targetClass = e.target.className;
+            if (targetClass.indexOf('thumbs') > -1) {
+                let id = e.target.getAttribute('comment_id');
+                jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
+                    if (result == 1) {
+
+                    }
+                })
+            }
+        }
     }
     showMarkComment(posX, posY, data) {
         this.initMarkComment(data);
