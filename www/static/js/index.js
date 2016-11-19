@@ -126,7 +126,7 @@ class FMark {
                             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
                                 _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
-                                _this.fmarkList[data.comment_id].discuss.push(Object.assign({}, data.discuss));
+                                _this.fmarkList[data.comment_id].discuss = [Object.assign({}, data.discuss)];
                                 _this.addNoteTip(_this.fmarkList[data.comment_id]);
                             });
                         }
@@ -166,15 +166,11 @@ class FMark {
                     if(data.code == 'mark') {
                         if (!rangeInfo.discuss) {
                             rangeInfo.discuss = [];
-                        } else {
-                            rangeInfo.comment_id = rangeInfo.id;
                         }
                         let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                         jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
                             _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
-                            
-                            
-                            _this.fmarkList[data.comment_id].discuss.push(Object.assign({}, data.discuss));
+                            _this.fmarkList[data.comment_id].discuss = [Object.assign({}, data.discuss)];
                             _this.addNoteTip(_this.fmarkList[data.comment_id]);
                         });
                     }
@@ -191,10 +187,10 @@ class FMark {
                 //取当前range的id
                 let noteId = target.parentNode.dataset.id,
                     rangeInfo = _this.fmarkList[noteId];
-
                 _this.currentNoteId = noteId;
                 //TODO 显示划线,弹出评论框
                 console.log(rangeInfo, rangeInfo.discuss);
+                console.log('_this.fmarkList', _this.fmarkList)
                 Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, rangeInfo['discuss']);
                 _this.markLine(rangeInfo);
 

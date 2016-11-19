@@ -97,7 +97,7 @@ class Modal {
                 html += `<li>
                             <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
                             <div class="note-content">${item.discuss_content}</div>
-                            <div class="note-tools"><span class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}赞</span></div>
+                            <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}赞</a></div>
                         </li>`;
             }
             html += '</ul>';
