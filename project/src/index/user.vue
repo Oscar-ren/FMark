@@ -8,7 +8,7 @@
 			</el-col>
 			<el-col :span="16">
 				<div class="grid-content user-website">
-					<el-tree :data="list"></el-tree>
+					<el-tree :data="list"  @node-click="changeUrl"></el-tree>
 				</div>
 			</el-col>
 		</el-row>
@@ -25,46 +25,35 @@ import {tree, row, col} from 'element-ui';
 			elRow: row,
 			elCol: col,
 		},
+		props: ['user'],
 		data() {
 			return {
-				list: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1'
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1'
-          }, {
-            label: '二级 2-2'
-          }]
-        }, {
-          label: '一级 3',
-          children: [{
-            label: '二级 3-1'
-          }, {
-            label: '二级 3-2'
-          }]
-        }],
+				list: [],
 			}
+		},
+		created() {
+			this.getList();
 		},
 		methods: {
 			getList() {
 				let params = {
-				
+					user_id: '123',
 				}
-				this.$http.post('/index/pages', params, {emulateJSON: true}).then((res) => {
-					let resData = res.data;
+				this.$http.post('/usercenter/getpages', params, {emulateJSON: true}).then((res) => {
+					let resData = res.body;
 					let errno = resData.errno;
 					let errmsg = resData.errmsg;
 					if(errno === 0) {
-						me.list = resData;
+
+						this.list = resData.data;
 					}else{
 					}
 				}, (res) => {
 
 				})
+			},
+			changeUrl(data) {
+				// location.href = data.url;
 			}
 		},
 	}

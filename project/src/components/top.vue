@@ -7,12 +7,13 @@
 			<el-col :span="10">
 				<div class="grid-content user">
 					<div v-show="user.log">
-						<span>{{user.account}}</span>
+						<span>{{user.user_id}}</span>
+						<el-button type="primary" @click="logout()">退出</el-button>
 					</div>
 					<div v-show="!user.log">
 						<el-form :inline="true" :model="log" class="log">
 						  <el-form-item>
-						    <el-input v-model="log.account" placeholder="账号"></el-input>
+						    <el-input v-model="log.user_id" placeholder="账号"></el-input>
 						  </el-form-item>					  
 						  <el-form-item>
 						    <el-input v-model="log.password" placeholder="密码" type="password"></el-input>
@@ -36,6 +37,7 @@
 
 
 <script>
+import eventHub from '../components/eventHub.vue';
 import 'element-ui/lib/theme-default/index.css';
 import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 	export default {
@@ -48,18 +50,19 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 			elFormItem: formItem,
 			elDialog: dialog
 		},
+		props: {
+			user:{
+				type: Object,
+			}
+		},
 		data() {
 			return {
 				alertInfo: {
 					show: false,
 					info: ''
 				},
-				user: {
-					log: false,
-					account: ''
-				},
 				log: {
-					account: '',
+					user_id: '',
 					password: ''
 				}
 			}
@@ -67,41 +70,43 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 		methods: {
 			signIn() {
 				let params = {
-					account: this.log.account,
+					user_id: this.log.user_id,
 					password: this.log.password,
 				}
-				this.$http.post('/index/signin', params, {emulateJSON: true}).then((res) => {
+				console.log(this)
+				let alert = '';
+				this.$http.post('/usercenter/signin', params, {emulateJSON: true}).then((res) => {
 					let resData = res.body;
 					let errno = resData.errno;
 					let errmsg = resData.errmsg;
 					if(errno === 0) {
-						this.user = {
-							log: true,
-							account: resData.data.account,
-						}
-						console.log(resData.data)
-						this.$router.push('/user');
-						this.alertInfo = {
-							show: true,
-							info: '登录成功！'
-						}
+						eventHub.$emit('login' ,this.log.user_id);
+						localStorage.setItem('user_id', resData.data);
+						this.$router.push('user');
 					}else{
 						this.alertInfo = {
 							show: true,
-							info: '登录失败！'
+							info: errmsg
 						}
 					}
 				}, (res) => {
 						this.alertInfo = {
 							show: true,
-							info: '登录失败！'
-						}
+							info: errmsg
+					}
 				})
-			}
+			},
+			logout() {
+				localStorage.removeItem('user_id');
+				eventHub.$emit('logout');
+			},
 		},
+
 	}
 </script>
-
+<style>
+	
+</style>
 
 <style scoped>
 	.header{
@@ -115,8 +120,14 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 		float: right;
 	}
 	.logo{
-		width: 80px;
-		height: 80px;
+		width: 60px;
+		height: 60px;
 		background: url(/assets/css);
+	}
+	.user{
+		height: 60px;
+		line-height: 60px;
+		text-align: right;
+		padding-right: 30px;
 	}
 </style>

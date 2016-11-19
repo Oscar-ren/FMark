@@ -5,13 +5,15 @@ import vueResource from 'vue-resource';
 Vue.use(vueResource);
 import signup from './index/signup.vue';
 import user from './index/user.vue';
+import addwebsite from './index/addwebsite.vue';
 import App from './App.vue';
 
 const routes = [
 	{path: '/signup', component: signup},
 	{path: '/user', component: user},
-	{path: '*', redirect: '/user'},
+	{path: '/addwebsite', component: addwebsite},
 ];
+
 const router = new vueRouter({
 	routes
 });

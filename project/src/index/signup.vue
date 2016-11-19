@@ -5,11 +5,14 @@
 				<div class="grid-content userInfo">
 					<el-form :model="register" label-width="80px">
 					  <el-form-item label="帐号">
-					    <el-input v-model="register.account"></el-input>
+					    <el-input v-model="register.user_id"></el-input>
 					  </el-form-item>
 					  <el-form-item label="密码">
 					    <el-input v-model="register.password" type="password"></el-input>
 					  </el-form-item>		
+					  <el-form-item label="邮箱">
+					    <el-input v-model="register.email" type="email"></el-input>
+					  </el-form-item>							  
 					  <el-form-item>
 					    <el-button type="primary" @click="signUp()">注册</el-button>
 					  </el-form-item>
@@ -17,18 +20,22 @@
 				</div>
 			</el-col>
 			<el-col :span="10">
-				<div class="grid-content  banner">
-					
+				<div class="grid-content banner">
 				</div>
 			</el-col>
 		</el-row>
-
+		<el-dialog title="提示" size="tiny" v-show="alertInfo.show">
+		  <span>{{alertInfo.info}}</span>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click.native="alertInfo.show = false">确定</el-button>
+		  </span>
+		</el-dialog>
 	</div>
 </template>
 
 <script>
 import 'element-ui/lib/theme-default/index.css';
-import {form, formItem, row, col, input ,button} from 'element-ui';
+import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 	export default {
 		components: {
 			elInput: input,
@@ -37,32 +44,41 @@ import {form, formItem, row, col, input ,button} from 'element-ui';
 			elCol: col,
 			elForm: form,
 			elFormItem: formItem,
+			elDialog: dialog
 		},
 		data() {
 			return {
 				register: {
-					account: '',
-					password: ''
-				}
+					user_id: '',
+					password: '',
+					email: ''
+				},
+				alertInfo: {
+					show: false,
+					info: ''
+				},
 			}
 		},
 		methods: {
 			signUp() {
 				let params = {
-					account: this.register.account,
+					user_id: this.register.user_id,
 					password: this.register.password,
 				}
-				this.$http.post('/index/signup', params, {emulateJSON: true}).then((res) => {
-					let errno = res.errno;
-					let errmsg = res.errmsg;
+				this.$http.post('/usercenter/signup', params, {emulateJSON: true}).then((res) => {
+					let resData = res.body;
+					let errno = resData.errno;
+					let errmsg = resData.errmsg;
 					if(errno === 0) {
-						router.go('/user');
+						this.$router.push('user');
+						this.alertInfo.info = '注册成功！';
 					}else{
-						console.log(res, '注册失败！')
+						this.alertInfo.info = '注册失败！';
 					}
 				}, (res) => {
-
+						this.alertInfo.info = '注册失败！';
 				})
+				this.alertInfo.show = true;			
 			}
 		},
 	}
@@ -81,9 +97,8 @@ import {form, formItem, row, col, input ,button} from 'element-ui';
 	.fr{
 		float: right;
 	}
-	.logo{
-		width: 80px;
-		height: 80px;
-		background: url(/assets/css);
+	.banner{
+		width: 400px;
+		height: 400px;
 	}
 </style>
