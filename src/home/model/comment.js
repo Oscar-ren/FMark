@@ -30,10 +30,23 @@ export default class extends think.model.base {
 	}
 	getComment(url, title) {
 		let model = this.model("comment");
-
+		let self = this;
+		let commentData;
 		return model.where({
 			url: url,
 			title: title
-		}).select();
+		}).select().then(function(data) {
+			commentData = data;
+			let promises = [];
+			data.forEach(function(item) {
+				promises.push(self.getDiscussbyId(item.id));
+			});
+			return Promise.all(promises);
+		}).then(function(data) {
+			commentData.forEach(function(item, index) {
+				item['discuss'] = data[index];
+			});
+			return Promise.resolve(commentData);
+		})
 	}
 }

@@ -1,4 +1,4 @@
-import {defered, getChildbyClass} from './util';
+import {defered, getChildbyClass, hasContainNode} from './base';
 import jsonp from 'jsonp';
 import querystring from 'querystring';
 
@@ -20,10 +20,12 @@ class Modal {
         }
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
-        markModal.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div><div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
-            '<p><input class="mark-name" placeholder="显示名称"/></p>' +
-            '<textarea class="mark-content" placeholder="mark it"></textarea>' +
-            '<p><button class="fmark-btn" id="mark-btn">Mark</button></p></div>';
+        markModal.innerHTML = `<div class="mark-triangle"><i class="triangle"></i></div>
+                               <div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
+                                    <p><input class="mark-name" placeholder="显示名称"/></p>
+                                    <textarea class="mark-content" placeholder="mark it"></textarea>
+                                    <p><button class="fmark-btn" id="mark-btn">Mark</button></p>
+                                </div>`;
 
         document.body.appendChild(markModal);
 
@@ -62,7 +64,7 @@ class Modal {
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
-    initMarkComment(id) {
+    initMarkComment(data) {
         let _this = this;
         if (_this.markComment) {
             
@@ -79,30 +81,54 @@ class Modal {
             this.commentWrap = commentWrap;
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
-        jsonp(_this.host+'/mark/getdiscuss?id='+id, function(err, result) {
-            console.log(err, result);
-            let html = '<ul class="comment-ul">';
-            if (result.length) {
-                for (let index = 0; index < result.length; index++) {
-                    let item = result[index];
-                    html += '<li>';
-                    html += '<p>' + item.name + ' 的批注</p>';
-                    html += '<p>' + item.discuss_content + '</p>';
-                    html += '<p><span>赞</span></p>';
-                }
+       
+        let html = '';
+        if (data.length) {
+            html += '<ul class="comment-ul">';
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index];
+                html += `<li>
+                            <p class="comment-p">${item.name} 的批注</p>
+                            <p class="comment-p">${item.discuss_content}</p>
+                            <p class="comment-p"><span class="thumbs" comment_id="${item.comment_id}">${item.thumbs || ''}赞</span></p>
+                        </li>`;
             }
             html += '</ul>';
-            _this.commentWrap.innerHTML = html;
-        });
+
+            if (data.length > 1) {
+
+                html += `<p class="comment-page">;
+                            <span class="now">1</span>/<span class="all">${data.length}</span>
+                        </p>`;
+            }
+        }
+        _this.commentWrap.innerHTML = html;
+        _this.commentWrap.onclick = function(e) {
+            let targetClass = e.target.className;
+            if (targetClass.indexOf('thumbs') > -1) {
+                let id = e.target.getAttribute('comment_id');
+                jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
+                    if (result == 1) {
+
+                    }
+                })
+            }
+        }
     }
-    showMarkComment(posX, posY, id) {
-        this.initMarkComment(id);
+    showMarkComment(posX, posY, data) {
+        this.initMarkComment(data);
 
         this.markComment.style.top = posY + 6 + 'px';
         this.markComment.style.left = posX - 85  + 'px';
         this.markComment.style.display = 'block';
     }
-    hideMarkComment() {
+    hideMarkComment(target) {
+        if (target && this.markComment) {
+            //从mouseup过来的，点击本身不关闭
+            if (hasContainNode(this.markComment, target)) {
+                return;
+            }
+        }
         this.markComment && (this.markComment.style.display = 'none');
     }
     initMarkPopup() {
@@ -112,7 +138,16 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note cansel-underline">取消划线</li><li class="mark-note make-underline">划线</li><li class="mark-note markit">批注</li>'
+        markPopup.innerHTML = `<li class="mark-triangle"><i class="triangle"></i></li>
+                               <li class="mark-note del">
+                                   <button class="cancel-underline">取消划线</button>
+                               </li>
+                               <li class="mark-note underline">
+                                   <button class="make-underline">划线</button>
+                               </li>
+                               <li class="mark-note note">
+                                   <button class="markit">评论</button>
+                               </li>`;
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
@@ -128,10 +163,8 @@ class Modal {
             let targetClass = ev.target.className;
             if (targetClass.indexOf('make-underline') > -1) {
                 defer.resolve({code: 'underline'});
-                // messageIframe.window.postMessage({'code':'underline','markdata':_this.makedata(data)}, '*');
-            } else if (targetClass.indexOf('cansel-underline') > -1) {
+            } else if (targetClass.indexOf('cancel-underline') > -1) {
                 defer.resolve({code: 'del-underline'});
-                // messageIframe.window.postMessage({'code':'cansel-underline','markdata':_this.makedata(data)}, '*');
             } else if (targetClass.indexOf('markit') > -1) {
                 _this.showMarkModal(posX, posY);
             }
@@ -139,14 +172,15 @@ class Modal {
         //修正的像素是为了尖角在所想的位置
         if (hasline) {
             this.markPopup.className = 'mark-it hasline';
+            this.markPopup.style.left = posX - 65.5  + 'px';
+        } else {
+            this.markPopup.className = 'mark-it';
+            this.markPopup.style.left = posX - 54.5  + 'px';
         }
+
+        //算弹窗宽度
         this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';
-        // underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
-        // setTimeout(function() {
-        //     _this.hideMarkPopup();
-        // }, 1000 * 6);
         return defer.promise;
     }
     hideMarkPopup(hasResolve) {

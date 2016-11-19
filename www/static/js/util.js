@@ -56,7 +56,8 @@ let transfer = (info) => {
         //已查找长度
         beginTextLen = 0,
         id = info.id,
-        type = info.type;
+        type = info.type,
+        isSelf = info.hasAuthor;
 
     /**
      * 遍历节点渲染
@@ -75,7 +76,7 @@ let transfer = (info) => {
                 if(nextSibling.nodeValue.length >= restTextLen) {
                     nextSibling.splitText(restTextLen);
                 }
-                changeNodeStyle(nextSibling, id, type);
+                changeNodeStyle(nextSibling, id, type, isSelf);
                 //找到了开头,下一个循环
                 return 1;
             }else {
@@ -90,13 +91,13 @@ let transfer = (info) => {
             //判断长度
             if (normalTextLen >= restTextLen) {
                 currentNode.splitText(restTextLen);
-                changeNodeStyle(currentNode, id, type);
+                changeNodeStyle(currentNode, id, type, isSelf);
                 endSearched = true;
                 //全都找完了,退出
                 return 2;
             } else {
                 restTextLen -= normalTextLen;
-                changeNodeStyle(currentNode, id, type);
+                changeNodeStyle(currentNode, id, type, isSelf);
             }
         }
 
@@ -113,13 +114,16 @@ let transfer = (info) => {
     /**
      * 改变选取区域样式
      */
-    let changeNodeStyle = (node, id, type) => {
+    let changeNodeStyle = (node, id, type, isSelf) => {
         let par = node.parentNode;
         let spanEle = document.createElement('fm');
         if(type == 1) {
             spanEle.setAttribute('class', 'fmark-underline');
         }else {
             spanEle.setAttribute('class', 'fmark-note');
+        }
+        if(isSelf) {
+            spanEle.setAttribute('class', spanEle.getAttribute('class') + ' isSelf');
         }
         spanEle.setAttribute('data-id', id);
         spanEle.appendChild(node.cloneNode(false));
@@ -175,51 +179,5 @@ let reverse = (info) => {
     }
     core(ancestorNode);
 }
-/**
- * 获取延迟对象
- * @param 
- */
-let defered = () => {
-    let defer = {};
-    defer.promise = new Promise(function(resolve, reject) {
-        defer.resolve = function(data) {
-            resolve(data);
-        }
-        defer.reject = function(data) {
-            reject(data);
-        }
-    });
-    return defer;
-}
-/**
- * 或去节点的子元素
- * @param className
- */
-let getChildbyClass = (node, className) => {
-    let children = node.childNodes;
-    if (!children.length) {
-        return false;
-    }
-    for (let index = 0; index < children.length; index++) {
-        if (children[index].className && children[index].className.indexOf(className) > -1) {
-            return children[index];
-        }
-        let temp = getChildbyClass(children[index], className);
-        if (temp) {
-            return temp;
-        }
-    }
-    return false;
-}
-let makeAjaxData = (data) => {
-    let arr = [];
-    for (let key in data) {
-        let str = data[key];
-        if (typeof str == 'object') {
-            str = JSON.stringify(str);
-        }
-        arr.push(key + '=' + str);
-    }
-    return arr.join('&');
-}
-export {traversalStartLen, transfer, reverse, defered, getChildbyClass, makeAjaxData};
+
+export {traversalStartLen, transfer, reverse};

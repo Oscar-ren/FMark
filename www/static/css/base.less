@@ -1,0 +1,207 @@
+@popupColor: #4c4c48;
+
+body.hide-all-lines {
+    .fmark-underline {
+        border-width: 0;
+    }
+}
+
+.fmark-hide {
+    visibility: hidden;
+}
+
+/*划线和评论的底部线样式*/
+.fmark-underline.isSelf, .fmark-note {
+    border-bottom: 3px solid transparent;
+    background: linear-gradient(#adadad, #adadad) no-repeat;
+    background-size: 100% 2px;
+    background-position: 0 1.09em;
+}
+
+.fmark-underline {
+    border-bottom: 3px solid transparent;
+    background: linear-gradient(90deg, #8e8e90 66%, transparent 0) repeat-x;
+    background-size: .2em 1px;
+    background-position: 0 1.04em;
+    text-shadow: .05em 0 white, -.05em 0 white;
+}
+
+/*评论tip框*/
+.note-dot {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: none, url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iOXB4IiBoZWlnaHQ9IjlweCIgdmlld0JveD0iMC41IDAuNSA5IDkiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMC41IDAuNSA5IDkiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHBhdGggZmlsbD0iIzZGOTBBNSIgZD0iTTUsMC41QzIuNTE0LDAuNSwwLjUsMi41MTQsMC41LDVTMi41MTQsOS41LDUsOS41UzkuNSw3LjQ4Niw5LjUsNVM3LjQ4NiwwLjUsNSwwLjV6IE01LjUwNyw1LjUwMmgxLjQ5DQoJTDUuMDE0LDcuNTA4bC0yLjA0LTIuMDA2aDEuNTJWMi41MDJoMS4wMTIiLz4NCjwvc3ZnPg0K) no-repeat;
+    cursor: pointer;
+
+    &.isSelf {
+        background: none, url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iOXB4IiBoZWlnaHQ9IjlweCIgdmlld0JveD0iMCAwIDkgOSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgOSA5IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwYXRoIGZpbGw9IiM5ODY2NjUiIGQ9Ik00LjUsMEMyLjAxNCwwLDAsMi4wMTQsMCw0LjVTMi4wMTQsOSw0LjUsOVM5LDYuOTg2LDksNC41UzYuOTg2LDAsNC41LDB6IE01LjAwNyw1LjAwMmgxLjQ5TDQuNTE0LDcuMDA4DQoJbC0yLjA0LTIuMDA2aDEuNTJ2LTNoMS4wMTIiLz4NCjwvc3ZnPg0K) no-repeat;
+    }
+}
+
+.mark-it {
+    list-style: none;
+    padding: 8px 0;
+    position: absolute;
+    background-color: @popupColor;
+    color: #fff;
+    margin: 0;
+    z-index: 10000;
+    display: none;
+    font-size: 0;
+
+    .del {
+        display: none;
+    }
+
+    .mark-triangle {
+        position: absolute;
+        display: block;
+        border-bottom: solid 8px #5b5b58;
+        border-left: solid 8px transparent;
+        border-right: solid 8px transparent;
+        top: -8px;
+        left: 50% - 8;
+
+        .triangle {
+            position: absolute;
+            display: block;
+            border-bottom: solid 7px @popupColor;
+            border-left: solid 7px transparent;
+            border-right: solid 7px transparent;
+            top: 1px;
+            left: -7px;
+        }
+    }
+
+    li {
+        display: inline-block;
+        border-right: 1px solid #5b5b58;
+
+        button {
+            background: @popupColor;
+            border: none;
+            color: #fff;
+            padding: 0 10px;
+            line-height: 26px;
+            margin: 0 6px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #3a3a38;
+            }
+        }
+    }
+
+    &.hasline .del {
+        display: inline-block !important;
+    }
+
+    &.hasline .underline {
+        display: none !important;
+    }
+}
+
+.mark-modal {
+    display: none;
+    position: absolute;
+    width: 300px;
+    border: solid 1px #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    z-index: 10000;
+
+    .mark-triangle {
+        position: absolute;
+        display: block;
+        border-bottom: solid 8px #ccc;
+        border-left: solid 8px transparent;
+        border-right: solid 8px transparent;
+        top: -8px;
+        left: 142px;
+
+        .triangle {
+            position: absolute;
+            display: block;
+            border-bottom: solid 7px #fff;
+            border-left: solid 7px transparent;
+            border-right: solid 7px transparent;
+            top: 1px;
+            left: -7px;
+        }
+    }
+
+    .mark-wrap {
+        padding: 4px;
+    }
+
+    .mark-content {
+        width: 100%;
+        height: 100px;
+        resize: none;
+        box-sizing: border-box;
+    }
+
+    .mark-name {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .mark-wrap p {
+        margin: 0;
+        padding: 4px 0;
+    }
+
+    .close-btn {
+        float: right;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .fmark-btn {
+        cursor: pointer;
+    }
+}
+
+.mark-comment {
+    display: none;
+    position: absolute;
+    width: 300px;
+    border: solid 1px #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    z-index: 10000;
+
+    .mark-triangle {
+        position: absolute;
+        display: block;
+        border-bottom: solid 8px #ccc;
+        border-left: solid 8px transparent;
+        border-right: solid 8px transparent;
+        top: -8px;
+        left: 142px;
+
+        .triangle {
+            position: absolute;
+            display: block;
+            border-bottom: solid 7px #fff;
+            border-left: solid 7px transparent;
+            border-right: solid 7px transparent;
+            top: 1px;
+            left: -7px;
+        }
+    }
+
+    .comment-ul {
+        margin: 0;
+        padding: 0 4px;
+        list-style: none;
+    }
+    .comment-p {
+        margin: 4px 0;
+    }
+}

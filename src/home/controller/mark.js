@@ -22,6 +22,7 @@ export default class extends Base {
   }
   async addAction() {
   	let data = this.get();
+      console.log(data, data.cookie);
     let createtime = Date.now();
     let comment_id;
     if (data['comment_id']) {
