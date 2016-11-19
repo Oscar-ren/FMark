@@ -17,6 +17,21 @@ export default class extends Base {
     this.assign('discuss', data);
     return this.display();
   }
+  async thumbsAction() {
+    let discuss_id = this.get('id');
+    let data, code;
+    let thumbs = await this.session('thumbs');
+    if (thumbs == '+') {
+      data = await this.model('comment').thumbsDecre(discuss_id);
+      await this.session('thumbs', '-');
+      code = '取消赞';
+    } else {
+      data = await this.model('comment').thumbsIncre(discuss_id);
+      await this.session('thumbs', '+');
+      code = '赞';
+    }
+    return this.jsonp(data['thumbs']+code);
+  }
   randomName() {
     return '游客' + Math.floor(Math.random() * 1000);
   }

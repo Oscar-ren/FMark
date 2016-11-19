@@ -90,7 +90,7 @@ class Modal {
                 html += `<li>
                             <p class="comment-p">${item.name} 的批注</p>
                             <p class="comment-p">${item.discuss_content}</p>
-                            <p class="comment-p"><span class="thumbs" comment_id="${item.comment_id}">${item.thumbs || ''}赞</span></p>
+                            <p class="comment-p"><span class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}赞</span></p>
                         </li>`;
             }
             html += '</ul>';
@@ -106,10 +106,10 @@ class Modal {
         _this.commentWrap.onclick = function(e) {
             let targetClass = e.target.className;
             if (targetClass.indexOf('thumbs') > -1) {
-                let id = e.target.getAttribute('comment_id');
+                let id = e.target.getAttribute('dicuss_id');
                 jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
-                    if (result == 1) {
-
+                    if (result) {
+                        e.target.innerHTML = result;
                     }
                 })
             }
