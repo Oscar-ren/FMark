@@ -97,6 +97,7 @@ class FMark {
                         title: document.title,
                         url: location.href,
                         article_content: selRange.toString(),
+                        discuss: [],
                         position: {
                             start_index: traversalStartLen(selRange),
                             text_length: selRange.toString().trim().length,
@@ -122,9 +123,11 @@ class FMark {
                             });
                         }else if(data.code == 'mark') {
                             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
-                            jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
-                                _this.fmarkList[id] = Object.assign(param, {id: id});
-                                _this.addNoteTip(_this.fmarkList[id]);
+                            jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
+                                _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
+                                debugger;
+                                _this.fmarkList[data.comment_id].discuss.push(Object.assign({}, data.discuss));
+                                _this.addNoteTip(_this.fmarkList[data.comment_id]);
                             });
                         }
                     }, function(err) {
@@ -161,10 +164,18 @@ class FMark {
                         );
                     }
                     if(data.code == 'mark') {
+                        if (!rangeInfo.discuss) {
+                            rangeInfo.discuss = [];
+                        } else {
+                            rangeInfo.comment_id = rangeInfo.id;
+                        }
                         let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
-                        jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
-                            _this.fmarkList[id] = Object.assign(param, {id: id});
-                            _this.addNoteTip(_this.fmarkList[id]);
+                        jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
+                            _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
+                            
+                            
+                            _this.fmarkList[data.comment_id].discuss.push(Object.assign({}, data.discuss));
+                            _this.addNoteTip(_this.fmarkList[data.comment_id]);
                         });
                     }
                 }, function(err) {

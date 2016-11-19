@@ -104,7 +104,7 @@ class Modal {
 
             if (data.length > 1) {
 
-                html += `<p class="comment-page">;
+                html += `<p class="comment-page">
                             <span class="now">1</span>/<span class="all">${data.length}</span>
                         </p>`;
             }

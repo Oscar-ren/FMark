@@ -20,17 +20,17 @@ export default class extends Base {
   async thumbsAction() {
     let discuss_id = this.get('id');
     let data, code;
-    let thumbs = await this.session('thumbs');
+    let thumbs = await this.session('thumbs'+discuss_id);
     if (thumbs == '+') {
       data = await this.model('comment').thumbsDecre(discuss_id);
-      await this.session('thumbs', '-');
-      code = '取消赞';
+      await this.session('thumbs'+discuss_id, '-');
+      code = '赞';
     } else {
       data = await this.model('comment').thumbsIncre(discuss_id);
-      await this.session('thumbs', '+');
-      code = '赞';
+      await this.session('thumbs'+discuss_id, '+');
+      code = '取消赞';
     }
-    return this.jsonp(data['thumbs']+code);
+    return this.jsonp((data['thumbs'] || '')+code);
   }
   randomName() {
     return '游客' + Math.floor(Math.random() * 1000);
@@ -40,6 +40,7 @@ export default class extends Base {
       console.log(data, data.cookie);
     let createtime = Date.now();
     let comment_id;
+    delete data.id;
     if (data['comment_id']) {
       comment_id = data['comment_id'];
     } else {
@@ -57,9 +58,9 @@ export default class extends Base {
     discuss['comment_id'] = comment_id;
     let discuss_id = await this.model('comment').addDiscuss(discuss);
 
-    let discuss = await this.model('discuss').where({id: discuss_id}).find();
+    let discussData = await this.model('discuss').where({id: discuss_id}).find();
 
-    return this.jsonp({comment_id:comment_id, discuss: discuss});
+    return this.jsonp({comment_id:comment_id, discuss: discussData});
   }
   async getdiscussAction() {
     let comment_id = this.get('id');
