@@ -1,5 +1,6 @@
 import {defered, getChildbyClass, hasContainNode} from './base';
 import jsonp from 'jsonp';
+import {EventUtil} from './base';
 import querystring from 'querystring';
 
 class Modal {
@@ -21,10 +22,16 @@ class Modal {
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
         markModal.innerHTML = `<div class="mark-triangle"><i class="triangle"></i></div>
-                               <div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
-                                    <p><input class="mark-name" placeholder="显示名称"/></p>
-                                    <textarea class="mark-content" placeholder="mark it"></textarea>
-                                    <p><button class="fmark-btn" id="mark-btn">Mark</button></p>
+                               <div class="mark-wrap">
+                                    <div><textarea class="mark-content" placeholder="你的批注"></textarea></div>
+                                    <div class="share">分享到</div>
+                                    <div class="tool-bar">
+                                        <input class="mark-name" placeholder="请填入名称"/>
+                                        <div class="pull-right">
+                                            <a class="close-btn">取消</a>
+                                            <button class="fmark-btn" id="mark-btn">Mark</button>
+                                        </div>
+                                    </div>
                                 </div>`;
 
         document.body.appendChild(markModal);
@@ -126,11 +133,13 @@ class Modal {
         if (target && this.markComment) {
             //从mouseup过来的，点击本身不关闭
             if (hasContainNode(this.markComment, target)) {
-                return;
+                return false;
             }
         }
         this.markComment && (this.markComment.style.display = 'none');
+        return true;
     }
+    //初始化功能框
     initMarkPopup() {
         let _this = this;
         if (_this.markPopup) {
@@ -152,6 +161,8 @@ class Modal {
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
     }
+
+    //展示功能框
     showMarkPopup(posX, posY, hasline) {
         if (!this.markPopup) {
             this.initMarkPopup();
