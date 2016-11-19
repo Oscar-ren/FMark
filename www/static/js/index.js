@@ -125,7 +125,6 @@ class FMark {
                             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
                                 _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
-                                debugger;
                                 _this.fmarkList[data.comment_id].discuss.push(Object.assign({}, data.discuss));
                                 _this.addNoteTip(_this.fmarkList[data.comment_id]);
                             });
@@ -166,8 +165,6 @@ class FMark {
                     if(data.code == 'mark') {
                         if (!rangeInfo.discuss) {
                             rangeInfo.discuss = [];
-                        } else {
-                            rangeInfo.comment_id = rangeInfo.id;
                         }
                         let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                         jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
