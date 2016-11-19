@@ -21,12 +21,14 @@ class Modal {
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
         markModal.innerHTML = '<div class="mark-triangle"><i class="triangle"></i></div><div class="mark-wrap"><p class="fmark-info"><span class="info">The FMark mark the best!</span><span class="close-btn" title="关闭">X</span></p>' +
+            '<p><input class="mark-name" placeholder="显示名称"/></p>' +
             '<textarea class="mark-content" placeholder="mark it"></textarea>' +
             '<p><button class="fmark-btn" id="mark-btn">Mark</button></p></div>';
 
         document.body.appendChild(markModal);
 
         let markContent = _this.markContent = getChildbyClass(markModal, 'mark-content');
+        let markName = _this.markName = getChildbyClass(markModal, 'mark-name');
         
         markModal.onclick = function(ev) {
             let targetClass = ev.target.className;
@@ -36,8 +38,7 @@ class Modal {
             } else if (targetClass.indexOf('fmark-btn') > -1) {
                 if (markContent.value) {
                     _this.hideMarkModal();
-                    _this.popupDefer.resolve({code: 'mark', msg: markContent.value});
-                    _this.marking = false;
+                    _this.popupDefer.resolve({code: 'mark', msg: markContent.value, name: markName.value});
                 }
             }
         }
@@ -53,10 +54,13 @@ class Modal {
         this.markModal.style.left = posX - 150  + 'px';
         this.markModal.style.display = 'block';
         this.markContent.focus();
+
+        this.marking = true;
         // fmarkFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
     }
     hideMarkModal() {
         this.markModal && (this.markModal.style.display = 'none');
+        this.marking = false;
     }
     initMarkComment(id) {
         let _this = this;
@@ -130,7 +134,6 @@ class Modal {
                 // messageIframe.window.postMessage({'code':'cansel-underline','markdata':_this.makedata(data)}, '*');
             } else if (targetClass.indexOf('markit') > -1) {
                 _this.showMarkModal(posX, posY);
-                _this.marking = true;
             }
         }
         //修正的像素是为了尖角在所想的位置

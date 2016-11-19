@@ -152,7 +152,7 @@ class FMark {
                         );
                     }
                     if(data.code == 'mark') {
-                        let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg});
+                        let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                         jsonp( _this.host + '/mark/add?' + makeAjaxData(param), function(err, id) {
                             _this.fmarkList[id] = Object.assign(param, {id: id});
                             _this.addNoteTip(_this.fmarkList[id]);
@@ -174,7 +174,7 @@ class FMark {
 
                 _this.currentNoteId = noteId;
                 //TODO 显示划线,弹出评论框
-                Modal.showMarkModal((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom)
+                Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, noteId)
                 _this.markLine(rangeInfo);
 
             //点其他地方隐藏当前存储的已显示的评论的划线

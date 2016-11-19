@@ -211,4 +211,15 @@ let getChildbyClass = (node, className) => {
     }
     return false;
 }
-export {traversalStartLen, transfer, reverse, defered, getChildbyClass};
+let makeAjaxData = (data) => {
+    let arr = [];
+    for (let key in data) {
+        let str = data[key];
+        if (typeof str == 'object') {
+            str = JSON.stringify(str);
+        }
+        arr.push(key + '=' + str);
+    }
+    return arr.join('&');
+}
+export {traversalStartLen, transfer, reverse, defered, getChildbyClass, makeAjaxData};

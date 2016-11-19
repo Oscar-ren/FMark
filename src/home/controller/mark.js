@@ -17,6 +17,9 @@ export default class extends Base {
     this.assign('discuss', data);
     return this.display();
   }
+  randomName() {
+    return '游客' + Math.floor(Math.random() * 1000);
+  }
   async addAction() {
   	let data = this.get();
     let createtime = Date.now();
@@ -33,6 +36,7 @@ export default class extends Base {
 
     let discuss = {};
     discuss['discuss_content'] = data['discuss_content'];
+    discuss['name'] = data['name'] || this.randomName();
     discuss['createtime'] = createtime;
     discuss['comment_id'] = comment_id;
     await this.model('comment').addDiscuss(discuss);
