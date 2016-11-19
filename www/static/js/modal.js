@@ -139,13 +139,13 @@ class Modal {
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
         markPopup.innerHTML = `<li class="mark-triangle"><i class="triangle"></i></li>
-                               <li class="mark-note">
-                                   <button class="cansel-underline">取消划线</button>
+                               <li class="mark-note del">
+                                   <button class="cancel-underline">取消划线</button>
                                </li>
-                               <li class="mark-note">
+                               <li class="mark-note underline">
                                    <button class="make-underline">划线</button>
                                </li>
-                               <li class="mark-note">
+                               <li class="mark-note note">
                                    <button class="markit">评论</button>
                                </li>`;
         
@@ -163,10 +163,8 @@ class Modal {
             let targetClass = ev.target.className;
             if (targetClass.indexOf('make-underline') > -1) {
                 defer.resolve({code: 'underline'});
-                // messageIframe.window.postMessage({'code':'underline','markdata':_this.makedata(data)}, '*');
-            } else if (targetClass.indexOf('cansel-underline') > -1) {
+            } else if (targetClass.indexOf('cancel-underline') > -1) {
                 defer.resolve({code: 'del-underline'});
-                // messageIframe.window.postMessage({'code':'cansel-underline','markdata':_this.makedata(data)}, '*');
             } else if (targetClass.indexOf('markit') > -1) {
                 _this.showMarkModal(posX, posY);
             }
@@ -174,16 +172,15 @@ class Modal {
         //修正的像素是为了尖角在所想的位置
         if (hasline) {
             this.markPopup.className = 'mark-it hasline';
+            this.markPopup.style.left = posX - 65.5  + 'px';
         } else {
             this.markPopup.className = 'mark-it';
+            this.markPopup.style.left = posX - 54.5  + 'px';
         }
+
+        //算弹窗宽度
         this.markPopup.style.top = posY + 6 + 'px';
-        this.markPopup.style.left = posX - 85  + 'px';
         this.markPopup.style.display = 'block';
-        // underlineFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
-        // setTimeout(function() {
-        //     _this.hideMarkPopup();
-        // }, 1000 * 6);
         return defer.promise;
     }
     hideMarkPopup(hasResolve) {

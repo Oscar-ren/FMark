@@ -1,4 +1,4 @@
-@nice-blue: #5B83AD;
+@popupColor: #4c4c48;
 
 body.hide-all-lines {
     .fmark-underline {
@@ -41,31 +41,32 @@ body.hide-all-lines {
 
 .mark-it {
     list-style: none;
-    padding: 0;
+    padding: 8px 0;
     position: absolute;
-    background-color: #4c4c48;
+    background-color: @popupColor;
     color: #fff;
     margin: 0;
     z-index: 10000;
     display: none;
+    font-size: 0;
 
-    .cansel-underline {
+    .del {
         display: none;
     }
 
     .mark-triangle {
         position: absolute;
         display: block;
-        border-bottom: solid 8px #ccc;
+        border-bottom: solid 8px #5b5b58;
         border-left: solid 8px transparent;
         border-right: solid 8px transparent;
         top: -8px;
-        left: 81px;
+        left: 50% - 8;
 
         .triangle {
             position: absolute;
             display: block;
-            border-bottom: solid 7px #fff;
+            border-bottom: solid 7px @popupColor;
             border-left: solid 7px transparent;
             border-right: solid 7px transparent;
             top: 1px;
@@ -73,16 +74,30 @@ body.hide-all-lines {
         }
     }
 
-    .li {
+    li {
         display: inline-block;
         border-right: 1px solid #5b5b58;
+
+        button {
+            background: @popupColor;
+            border: none;
+            color: #fff;
+            padding: 0 10px;
+            line-height: 26px;
+            margin: 0 6px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #3a3a38;
+            }
+        }
     }
 
-    &.hasline .cansel-underline {
-        display: block !important;
+    &.hasline .del {
+        display: inline-block !important;
     }
 
-    &.hasline .make-underline {
+    &.hasline .underline {
         display: none !important;
     }
 }
