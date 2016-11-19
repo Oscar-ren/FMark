@@ -14,6 +14,20 @@ export default class extends think.model.base {
 		data['thumbs'] = 0;
 		return model.add(data);
 	}
+	thumbsIncre(id) {
+		let model = this.model("discuss");
+
+		return model.where({id: id}).increment('thumbs').then(function() {
+			return model.where({id: id}).find();
+		});
+	}
+	thumbsDecre(id) {
+		let model = this.model("discuss");
+
+		return model.where({id: id}).decrement('thumbs').then(function() {
+			return model.where({id: id}).find();
+		});
+	}
 	getDiscussbyId(id) {
 		let model = this.model("discuss");
 
