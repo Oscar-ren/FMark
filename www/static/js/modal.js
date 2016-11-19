@@ -150,7 +150,7 @@ class Modal {
         this.initMarkComment(data);
 
         this.markComment.style.top = posY + 6 + 'px';
-        this.markComment.style.left = posX - 85  + 'px';
+        this.markComment.style.left = posX - 150  + 'px';
         this.markComment.style.display = 'block';
     }
     hideMarkComment(target) {
