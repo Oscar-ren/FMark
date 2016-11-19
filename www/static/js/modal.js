@@ -124,7 +124,16 @@ class Modal {
         }
         let markPopup = document.createElement('ul');
         markPopup.className = 'mark-it';
-        markPopup.innerHTML = '<li class="mark-triangle"><i class="triangle"></i></li><li class="mark-note cansel-underline">取消划线</li><li class="mark-note make-underline">划线</li><li class="mark-note markit">批注</li>'
+        markPopup.innerHTML = `<li class="mark-triangle"><i class="triangle"></i></li>
+                               <li class="mark-note">
+                                   <button class="cansel-underline">取消划线</button>
+                               </li>
+                               <li class="mark-note">
+                                   <button class="make-underline">划线</button>
+                               </li>
+                               <li class="mark-note">
+                                   <button class="markit">评论</button>
+                               </li>`;
         
         document.body.appendChild(markPopup);
         this.markPopup = markPopup;
