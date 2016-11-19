@@ -42,19 +42,18 @@ body.hide-all-lines {
 .mark-it {
     list-style: none;
     padding: 0;
-    border-radius: 6px;
     position: absolute;
-    border: solid 1px #ccc;
-    background-color: #fff;
+    background-color: #4c4c48;
+    color: #fff;
     margin: 0;
     z-index: 10000;
     display: none;
 
-    &.cansel-underline {
+    .cansel-underline {
         display: none;
     }
 
-    &.mark-triangle {
+    .mark-triangle {
         position: absolute;
         display: block;
         border-bottom: solid 8px #ccc;
@@ -63,7 +62,7 @@ body.hide-all-lines {
         top: -8px;
         left: 81px;
 
-        &.triangle {
+        .triangle {
             position: absolute;
             display: block;
             border-bottom: solid 7px #fff;
@@ -74,13 +73,9 @@ body.hide-all-lines {
         }
     }
 
-    &.mark-note {
-        float: left;
-        text-align: center;
-        width: 84px;
-        height: 36px;
-        line-height: 36px;
-        cursor: pointer;
+    .li {
+        display: inline-block;
+        border-right: 1px solid #5b5b58;
     }
 
     &.hasline .cansel-underline {
@@ -101,7 +96,7 @@ body.hide-all-lines {
     background-color: #fff;
     z-index: 10000;
 
-    &.mark-triangle {
+    .mark-triangle {
         position: absolute;
         display: block;
         border-bottom: solid 8px #ccc;
@@ -110,7 +105,7 @@ body.hide-all-lines {
         top: -8px;
         left: 142px;
 
-        &.triangle {
+        .triangle {
             position: absolute;
             display: block;
             border-bottom: solid 7px #fff;
@@ -121,34 +116,34 @@ body.hide-all-lines {
         }
     }
 
-    &.mark-wrap {
+    .mark-wrap {
         padding: 4px;
     }
 
-    &.mark-content {
+    .mark-content {
         width: 100%;
         height: 100px;
         resize: none;
         box-sizing: border-box;
     }
 
-    &.mark-name {
+    .mark-name {
         width: 100%;
         box-sizing: border-box;
     }
 
-    &.mark-wrap p {
+    .mark-wrap p {
         margin: 0;
         padding: 4px 0;
     }
 
-    &.close-btn {
+    .close-btn {
         float: right;
         margin-right: 8px;
         cursor: pointer;
     }
 
-    &.fmark-btn {
+    .fmark-btn {
         cursor: pointer;
     }
 }
@@ -166,7 +161,7 @@ body.hide-all-lines {
     -ms-user-select: none;
     z-index: 10000;
 
-    &.mark-triangle {
+    .mark-triangle {
         position: absolute;
         display: block;
         border-bottom: solid 8px #ccc;
@@ -175,7 +170,7 @@ body.hide-all-lines {
         top: -8px;
         left: 142px;
 
-        &.triangle {
+        .triangle {
             position: absolute;
             display: block;
             border-bottom: solid 7px #fff;
@@ -186,7 +181,7 @@ body.hide-all-lines {
         }
     }
 
-    &.comment-ul {
+    .comment-ul {
         margin: 0;
         list-style: none;
     }
