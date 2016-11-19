@@ -48,7 +48,7 @@ export default class extends Base {
       comment_id = await this.model('comment').addComment(data);
   	}
     if (data.type == 1) {
-      return this.jsonp(comment_id);
+      return this.jsonp({comment_id:comment_id});
     }
 
     let discuss = {};

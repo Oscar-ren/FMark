@@ -109,16 +109,19 @@ body.hide-all-lines {
     }
 }
 
-.mark-modal {
+.mark-modal, .mark-comment {
     display: none;
     position: absolute;
     width: 300px;
     padding: 10px;
     font-size: 12px;
     border: solid 1px @noteBorderColor;
-    border-radius: 6px;
+    border-radius: 2px;
     background: @noteBgColor;
     z-index: 10000;
+}
+
+.mark-modal {
 
     .mark-triangle {
         position: absolute;
@@ -145,12 +148,8 @@ body.hide-all-lines {
         padding: 10px;
         height: 100px;
         resize: none;
+        outline: none;
         box-sizing: border-box;
-    }
-
-    .mark-name {
-        display: inline-block;
-        vertical-align: middle;
     }
 
     .share {
@@ -159,6 +158,12 @@ body.hide-all-lines {
 
     .tool-bar {
         overflow: hidden;
+
+        .mark-name {
+            display: inline-block;
+            vertical-align: middle;
+            outline: none;
+        }
 
         .close-btn {
             color: #999;
@@ -189,18 +194,6 @@ body.hide-all-lines {
 }
 
 .mark-comment {
-    display: none;
-    position: absolute;
-    width: 300px;
-    padding: 10px 15px;
-    border: 1px solid @noteBorderColor;
-    background: @noteBgColor;
-    border-radius: 2px;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    z-index: 10000;
 
     .mark-triangle {
         position: absolute;
@@ -226,6 +219,35 @@ body.hide-all-lines {
         margin: 0;
         padding: 0 4px;
         list-style: none;
+    }
+
+    li {
+        .note-owner {
+            color: #777;
+            margin-bottom: 10px;
+            .author {
+                margin-right: 3px;
+            }
+        }
+
+        .note-content {
+            line-height: 1.5;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .note-tools {
+            margin-top: 7px;
+            a {
+                color: #6d8fa5;
+                margin: 0 3px;
+
+                &:hover {
+                    background: #6d8fa5;
+                    color: #fff;
+                }
+            }
+        }
     }
     .comment-p {
         margin: 4px 0;
