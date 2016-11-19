@@ -1,4 +1,4 @@
-import {defered, getChildbyClass} from './util';
+import {defered, getChildbyClass, hasContainNode} from './base';
 import jsonp from 'jsonp';
 import querystring from 'querystring';
 
@@ -81,8 +81,9 @@ class Modal {
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
         jsonp(_this.host+'/mark/getdiscuss?id='+id, function(err, result) {
             console.log(err, result);
-            let html = '<ul class="comment-ul">';
+            let html = '';
             if (result.length) {
+                html += '<ul class="comment-ul">';
                 for (let index = 0; index < result.length; index++) {
                     let item = result[index];
                     html += '<li>';
@@ -90,8 +91,15 @@ class Modal {
                     html += '<p>' + item.discuss_content + '</p>';
                     html += '<p><span>赞</span></p>';
                 }
+                html += '</ul>';
+
+                if (result.length > 1) {
+
+                    html += '<p class="comment-page">';
+                    html += '<span class="now">1</span>/<span class="all"></span>'
+                    html += '</p>';
+                }
             }
-            html += '</ul>';
             _this.commentWrap.innerHTML = html;
         });
     }
@@ -102,7 +110,13 @@ class Modal {
         this.markComment.style.left = posX - 85  + 'px';
         this.markComment.style.display = 'block';
     }
-    hideMarkComment() {
+    hideMarkComment(target) {
+        if (target && this.markComment) {
+            //从mouseup过来的，点击本身不关闭
+            if (hasContainNode(this.markComment, target)) {
+                return;
+            }
+        }
         this.markComment && (this.markComment.style.display = 'none');
     }
     initMarkPopup() {
@@ -139,6 +153,8 @@ class Modal {
         //修正的像素是为了尖角在所想的位置
         if (hasline) {
             this.markPopup.className = 'mark-it hasline';
+        } else {
+            this.markPopup.className = 'mark-it';
         }
         this.markPopup.style.top = posY + 6 + 'px';
         this.markPopup.style.left = posX - 85  + 'px';

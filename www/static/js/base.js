@@ -68,7 +68,7 @@ let getAjax = function(type, url, data) {
 function setCookie(c_name, value, expiredays){
     var exdate = new Date();
     exdate.setDate(exdate.getDate() + expiredays);
-    document.cookie = c_name + "=" + value.getTime() + ((expiredays == null) ? "" : ";path=/;expires=" + exdate.toGMTString());
+    document.cookie = c_name + "=" + value + ((expiredays == null) ? "" : ";path=/;expires=" + exdate.toGMTString());
 }
 
 function getCookie(c_name) {
@@ -97,5 +97,61 @@ let encodeUrlParam = (markdata) => {
     }
     return data.join('&');
 }
+/**
+ * 获取节点的子元素
+ * @param className
+ */
+let getChildbyClass = (node, className) => {
+    let children = node.childNodes;
+    if (!children.length) {
+        return false;
+    }
+    for (let index = 0; index < children.length; index++) {
+        if (children[index].className && children[index].className.indexOf(className) > -1) {
+            return children[index];
+        }
+        let temp = getChildbyClass(children[index], className);
+        if (temp) {
+            return temp;
+        }
+    }
+    return false;
+}
 
-export {EventUtil, getAjax, encodeUrlParam, setCookie, getCookie};
+/**
+ * 获取延迟对象
+ * @param 
+ */
+let defered = () => {
+    let defer = {};
+    defer.promise = new Promise(function(resolve, reject) {
+        defer.resolve = function(data) {
+            resolve(data);
+        }
+        defer.reject = function(data) {
+            reject(data);
+        }
+    });
+    return defer;
+}
+/**
+ * 判断第二个节点是不是第一个节点的子元素
+ * @param 
+ */
+ let hasContainNode = (parent, child) => {
+    let children = parent.childNodes;
+    if (!children.length) {
+        return false;
+    }
+    for (let index = 0; index < children.length; index++) {
+        if (children[index] == child) {
+            return true;
+        }
+        let temp = hasContainNode(children[index], child);
+        if (temp) {
+            return temp;
+        }
+    }
+    return false;
+ }
+export {EventUtil, getAjax, encodeUrlParam, setCookie, getCookie, getChildbyClass, defered, hasContainNode};
