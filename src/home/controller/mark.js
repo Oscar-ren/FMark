@@ -55,9 +55,11 @@ export default class extends Base {
     discuss['name'] = data['name'] || this.randomName();
     discuss['createtime'] = createtime;
     discuss['comment_id'] = comment_id;
-    await this.model('comment').addDiscuss(discuss);
+    let discuss_id = await this.model('comment').addDiscuss(discuss);
 
-    return this.jsonp(comment_id);
+    let discuss = await this.model('discuss').where({id: discuss_id}).find();
+
+    return this.jsonp({comment_id:comment_id, discuss: discuss});
   }
   async getdiscussAction() {
     let comment_id = this.get('id');
