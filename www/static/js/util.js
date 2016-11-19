@@ -175,41 +175,5 @@ let reverse = (info) => {
     }
     core(ancestorNode);
 }
-/**
- * 获取延迟对象
- * @param 
- */
-let defered = () => {
-    let defer = {};
-    defer.promise = new Promise(function(resolve, reject) {
-        defer.resolve = function(data) {
-            resolve(data);
-        }
-        defer.reject = function(data) {
-            reject(data);
-        }
-    });
-    return defer;
-}
-/**
- * 或去节点的子元素
- * @param className
- */
-let getChildbyClass = (node, className) => {
-    let children = node.childNodes;
-    if (!children.length) {
-        return false;
-    }
-    for (let index = 0; index < children.length; index++) {
-        if (children[index].className && children[index].className.indexOf(className) > -1) {
-            return children[index];
-        }
-        let temp = getChildbyClass(children[index], className);
-        if (temp) {
-            return temp;
-        }
-    }
-    return false;
-}
 
-export {traversalStartLen, transfer, reverse, defered, getChildbyClass};
+export {traversalStartLen, transfer, reverse};

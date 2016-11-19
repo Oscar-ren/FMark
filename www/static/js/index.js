@@ -71,6 +71,7 @@ class FMark {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
             Modal.hideMarkPopup();
+            Modal.hideMarkComment(target);
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && target !== document.getElementsByTagName('html')[0]) {
@@ -120,7 +121,7 @@ class FMark {
                                 _this.markLine(_this.fmarkList[id]);
                             });
                         }else if(data.code == 'mark') {
-                            param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg});
+                            param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
                                 _this.fmarkList[id] = Object.assign(param, {id: id});
                                 _this.addNoteTip(_this.fmarkList[id]);
