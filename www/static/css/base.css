@@ -97,6 +97,10 @@ body.hide-all-lines .fmark-underline {
     resize: none;
     box-sizing: border-box;
 }
+.mark-modal .mark-name {
+    width: 100%;
+    box-sizing: border-box;
+}
 .mark-modal .mark-wrap p {
     margin: 0;
     padding: 4px 0;
