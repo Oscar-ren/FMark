@@ -184,7 +184,7 @@ class FMark {
                 _this.currentNoteId = noteId;
                 //TODO 显示划线,弹出评论框
                 console.log(rangeInfo, rangeInfo.discuss);
-                Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, noteId);
+                Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, rangeInfo['discuss']);
                 _this.markLine(rangeInfo);
 
             //点其他地方隐藏当前存储的已显示的评论的划线
