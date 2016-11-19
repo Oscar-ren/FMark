@@ -95,8 +95,11 @@ class Modal {
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
-    initMarkComment(data) {
+    initMarkComment(rangeInfo) {
         let _this = this;
+        if (!rangeInfo.length) {
+            return;
+        }
         if (_this.markComment) {
             
         } else {
@@ -112,9 +115,8 @@ class Modal {
             this.commentWrap = commentWrap;
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
-       
         let html = '';
-        if (data.length) {
+        rangeInfo.forEach(function(data, index) {
             html += '<ul class="comment-ul">';
             for (let index = 0; index < data.length; index++) {
                 let item = data[index];
@@ -132,8 +134,8 @@ class Modal {
                             <span class="now">1</span>/<span class="all">${data.length}</span>
                         </p>`;
             }
+            _this.commentWrap.innerHTML = html;
         }
-        _this.commentWrap.innerHTML = html;
         _this.commentWrap.onclick = function(e) {
             let targetClass = e.target.className;
             if (targetClass.indexOf('thumbs') > -1) {
