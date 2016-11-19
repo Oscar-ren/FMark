@@ -37,6 +37,7 @@ class Modal {
                 if (markContent.value) {
                     _this.hideMarkModal();
                     _this.popupDefer.resolve({code: 'mark', msg: markContent.value});
+                    _this.marking = false;
                 }
             }
         }
