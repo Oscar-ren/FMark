@@ -71,7 +71,6 @@ class FMark {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
             Modal.hideMarkPopup();
-            Modal.hideMarkComment(target);
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && target !== document.getElementsByTagName('html')[0]) {
@@ -141,6 +140,7 @@ class FMark {
         EventUtil.addHandler(document, 'click',function(e) {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
+            if(!Modal.hideMarkComment(target)) return;
 
             //点划线弹窗
             if(target && target.nodeName.toUpperCase() == 'FM') {

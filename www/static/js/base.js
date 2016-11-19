@@ -26,6 +26,13 @@ let EventUtil = {
     },
     getTarget: function(event){
         return event.target || event.srcElement;
+    },
+    stopBubble: function (event) {
+        if (event && event.stopPropagation) {
+            event.stopPropagation();
+        } else {
+            event.cancelBubble = true;
+        }
     }
 };
 
