@@ -29,6 +29,13 @@ let EventUtil = {
     }
 };
 
+/**
+ * ajax请求
+ * @param type
+ * @param url
+ * @param data
+ * @returns {Promise}
+ */
 let getAjax = function(type, url, data) {
     let promise = new Promise(function(resolve, reject) {
 
@@ -58,4 +65,37 @@ let getAjax = function(type, url, data) {
     return promise;
 }
 
-export {EventUtil, getAjax};
+function setCookie(c_name, value, expiredays){
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + expiredays);
+    document.cookie = c_name + "=" + value.getTime() + ((expiredays == null) ? "" : ";path=/;expires=" + exdate.toGMTString());
+}
+
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        let c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            let c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) c_end = document.cookie.length;
+            return unescape(document.cookie.substring(c_start, c_end))
+        }
+    }
+    return ""
+}
+
+/**
+ * 字符串化请求数据,拼接成请求数据格式
+ * @param markdata
+ * @returns {string}
+ */
+let encodeUrlParam = (markdata) => {
+    var data = [];
+    for (var key in markdata) {
+        var temp = typeof markdata[key] == 'object' ? JSON.stringify(markdata[key]) : markdata[key];
+        data.push(key + '=' + temp);
+    }
+    return data.join('&');
+}
+
+export {EventUtil, getAjax, encodeUrlParam, setCookie, getCookie};

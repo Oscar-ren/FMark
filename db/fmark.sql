@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `mark_comment`;
 CREATE TABLE `mark_comment` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` int(1) NOT NULL COMMENT '1-underline,2-mark',
-  `isSelf` int(1) NOT NULL COMMENT '1-yes,2-no',
+  `cookie` varchar(255) NOT NULL COMMENT '1-yes,2-no',
   `article_content` varchar(255) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,

@@ -211,4 +211,5 @@ let getChildbyClass = (node, className) => {
     }
     return false;
 }
+
 export {traversalStartLen, transfer, reverse, defered, getChildbyClass};

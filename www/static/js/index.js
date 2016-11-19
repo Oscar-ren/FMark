@@ -1,8 +1,8 @@
 'use strict';
 
 import '../css/base.css';
-import {traversalStartLen, transfer, reverse, makeAjaxData} from './util';
-import {EventUtil} from './base';
+import {traversalStartLen, transfer, reverse} from './util';
+import {EventUtil, encodeUrlParam, setCookie, getCookie} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
 /**
@@ -23,12 +23,9 @@ class FMark {
     bindEvent() {
 
         //TODO 设置cookie,过期时间为1天
-        var _date = new Date();
-        _date.setDate(_date.getDate()+30);
-        var _cookie = {
-            
+        if(!getCookie('fmark')) {
+            setCookie('fmark', (new Date()), 1);
         }
-        document.cookie = "fmark=value;expires=date";
 
         let _this = this;
 
@@ -42,8 +39,12 @@ class FMark {
             title: document.title,
             url: location.href
         };
-        jsonp( _this.host + '/mark/getcomment?' + makeAjaxData(param), function(err, result) {
+        jsonp( _this.host + '/mark/getcomment?' + encodeUrlParam(param), function(err, result) {
             for(let key in result) {
+                //TODO 每一条判断是否当前用户有权限修改,hasAuthor不会发给数据库
+                if(result[key].cookie == getCookie('fmark')) {
+                    result[key].hasAuthor = true;
+                }
                 result[key].position = JSON.parse(result[key].position);
                 _this.fmarkList[result[key].id] = result[key];
                 if(result[key].type == 2) {
@@ -104,7 +105,8 @@ class FMark {
                             bottom: rangeRect[rangeRect.length - 1].bottom,
                             left: rangeRect[rangeRect.length - 1].left,
                             top: rangeRect[rangeRect.length - 1].top
-                        }
+                        },
+                        cookie: getCookie('fmark')
                     }
 
                     //新数据
@@ -113,18 +115,17 @@ class FMark {
                         let param = '';
                         if(data.code == 'underline') {
                             param = Object.assign(currentRangeInfo, {type: 1});
+                            jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
+                                _this.fmarkList[id] = Object.assign(param, {id: id});
+                                _this.markLine(_this.fmarkList[id]);
+                            });
                         }else if(data.code == 'mark') {
                             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg});
-                        }
-                        jsonp( _this.host + '/mark/add?' + makeAjaxData(param), function(err, id) {
-                            _this.fmarkList[id] = Object.assign(param, {id: id});
-                            if(param.type == 1) {
-                                _this.markLine(_this.fmarkList[id]);
-
-                            }else {
+                            jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
+                                _this.fmarkList[id] = Object.assign(param, {id: id});
                                 _this.addNoteTip(_this.fmarkList[id]);
-                            }
-                        });
+                            });
+                        }
                     }, function(err) {
                         console.log(err, 'reject');
                     });
@@ -146,7 +147,7 @@ class FMark {
                 //删除划线
                 Modal.showMarkPopup((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, true).then(function(data) {
                     if(data.code == 'del-underline') {
-                        jsonp( _this.host + '/mark/deletecomment?' + makeAjaxData({id: target.dataset.id}),
+                        jsonp( _this.host + '/mark/deletecomment?' + encodeUrlParam({id: target.dataset.id}),
                             function(err, result) {
                                 console.log(result);
                                 let currentRangeId = target.dataset.id;
@@ -157,7 +158,7 @@ class FMark {
                     }
                     if(data.code == 'mark') {
                         let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg});
-                        jsonp( _this.host + '/mark/add?' + makeAjaxData(param), function(err, id) {
+                        jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
                             _this.fmarkList[id] = Object.assign(param, {id: id});
                             _this.addNoteTip(_this.fmarkList[id]);
                         });
@@ -191,8 +192,10 @@ class FMark {
 
     //添加评论小tip功能
     addNoteTip(currentRangeInfo) {
+        console.log(currentRangeInfo.cookie == getCookie('fmark'), currentRangeInfo.cookie, getCookie('fmark'));
         //计算选中文本最后一个字符宽度
-        let lastWordNode = document.getElementsByClassName('fmark-hide')[0];
+        let lastWordNode = document.getElementsByClassName('fmark-hide')[0],
+            className = '';
         if(!lastWordNode) {
             lastWordNode = document.createElement('span');
             lastWordNode.setAttribute('class', 'fmark-hide');
@@ -205,8 +208,9 @@ class FMark {
             noteDotNode = document.createElement('div');
 
         //添加标识
+        className = currentRangeInfo.hasAuthor ? 'note-dot isSelf' : 'note-dot';
         noteDotNode.setAttribute('data-id', currentRangeInfo.id);
-        noteDotNode.innerHTML = '<div class="note-dot" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
+        noteDotNode.innerHTML = '<div class=' + className + ' style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
         document.getElementById('markings-layer').appendChild(noteDotNode);
     }
     //划线功能
