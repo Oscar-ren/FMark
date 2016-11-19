@@ -145,6 +145,9 @@ body.hide-all-lines .fmark-underline {
     -ms-user-select: none;
     z-index: 10000;
 }
+.mark-comment .comment-p {
+    margin: 0;
+}
 .mark-comment .mark-triangle {
     position: absolute;
     display: block;
@@ -165,5 +168,6 @@ body.hide-all-lines .fmark-underline {
 }
 .mark-comment .comment-ul {
     margin: 0;
+    padding: 0;
     list-style: none;
 }
