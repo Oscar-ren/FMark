@@ -72,7 +72,7 @@ export default class extends Base {
     let url = this.get('url');
     let title = this.get('title');
 
-    let data = await this.model('comment').getComment(url, title);
+    let data = await this.model('comment').getComment(url, title, this);
 
     return this.jsonp(data);
   }

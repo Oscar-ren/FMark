@@ -24,7 +24,10 @@ class Modal {
         markModal.innerHTML = `<div class="mark-triangle"><i class="triangle"></i></div>
                                <div class="mark-wrap">
                                     <div><textarea class="mark-content" placeholder="你的批注"></textarea></div>
-                                    <div class="share">分享到</div>
+                                    <div class="share">分享到 
+                                        <label><input class="share-weibo" type="radio" name="share" /><i class="mark-weibo"></i></label>
+                                        <label><input class="share-qq" type="radio" name="share" /><i class="mark-qq"></i></label>
+                                    </div>
                                     <div class="tool-bar">
                                         <input class="mark-name" placeholder="请填入名称"/>
                                         <div class="pull-right">
@@ -38,6 +41,8 @@ class Modal {
 
         let markContent = _this.markContent = getChildbyClass(markModal, 'mark-content');
         let markName = _this.markName = getChildbyClass(markModal, 'mark-name');
+        let shareQQ  = getChildbyClass(markModal, 'share-qq');
+        let shareWeibo = getChildbyClass(markModal, 'share-weibo');
         
         markModal.onclick = function(ev) {
             let targetClass = ev.target.className;
@@ -47,7 +52,17 @@ class Modal {
             } else if (targetClass.indexOf('fmark-btn') > -1) {
                 if (markContent.value) {
                     _this.hideMarkModal();
-                    _this.popupDefer.resolve({code: 'mark', msg: markContent.value, name: markName.value});
+                    let share = '';
+                    if (shareWeibo.checked) {
+                        // share = `http://service.weibo.com/share/share.php?url=${encodeURIComponent(location.href)}&type=icon&language=zh_cn&title=${document.title}&pic=${share.pic}&searchPic=true&style=simple`;
+                        share = 'weibo';
+                    }
+                    if (shareQQ.checked) {
+                        // share = `http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(location.href)}&desc=${share.content}&title=${document.title}&summary=fqwva&pics=${share.pic}&style=203&otype=share`;
+                        share = 'qq';
+                    }
+                    // share && window.open(share);
+                    _this.popupDefer.resolve({code: 'mark', msg: markContent.value, name: markName.value, share: share});
                 }
             }
         }
@@ -67,7 +82,16 @@ class Modal {
         this.marking = true;
         // fmarkFrame.window.postMessage({'code':'markdata','markdata':data}, '*');
     }
-    hideMarkModal() {
+    hideMarkModal(target) {
+        if (target && this.markModal) {
+            //从mouseup过来的，点击本身不关闭
+            if (hasContainNode(this.markModal, target)) {
+                return false;
+            }
+            if (this.markModal.style.display == 'block') {
+                this.popupDefer.reject();
+            }
+        }
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
@@ -97,7 +121,7 @@ class Modal {
                 html += `<li>
                             <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
                             <div class="note-content">${item.discuss_content}</div>
-                            <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}赞</a></div>
+                            <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
                         </li>`;
             }
             html += '</ul>';
@@ -116,7 +140,7 @@ class Modal {
                 let id = e.target.getAttribute('dicuss_id');
                 jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
                     if (result) {
-                        e.target.innerHTML = result;
+                        e.target.innerHTML = result; 
                     }
                 })
             }
@@ -178,6 +202,8 @@ class Modal {
                 defer.resolve({code: 'del-underline'});
             } else if (targetClass.indexOf('markit') > -1) {
                 _this.showMarkModal(posX, posY);
+                ev.stopPropagation();
+                return false;
             }
         }
         //修正的像素是为了尖角在所想的位置

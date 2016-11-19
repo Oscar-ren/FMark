@@ -28,12 +28,28 @@ export default class extends think.model.base {
 			return model.where({id: id}).find();
 		});
 	}
-	getDiscussbyId(id) {
+	getDiscussbyId(id, ct) {
 		let model = this.model("discuss");
-
+		let discussData;
 		return model.where({
 			comment_id: id
-		}).select();
+		}).select().then(function(data) {
+			discussData = data;
+			let promises = [];
+			data.forEach(function(item) {
+				promises.push(ct.session('thumbs'+item.id));
+			});
+			return Promise.all(promises);
+		}).then(function(data) {
+			discussData.forEach(function(item, index) {
+				if (data[index] == '+') {
+					item['thumbs'] = 1;
+				} else {
+					item['thumbs'] = 0;
+				}
+			});
+			return Promise.resolve(discussData);
+		});
 	}
 	deleteComment(id) {
 		let model = this.model("comment");
@@ -42,7 +58,7 @@ export default class extends think.model.base {
 			id: id
 		}).delete();
 	}
-	getComment(url, title) {
+	getComment(url, title, ct) {
 		let model = this.model("comment");
 		let self = this;
 		let commentData;
@@ -53,7 +69,7 @@ export default class extends think.model.base {
 			commentData = data;
 			let promises = [];
 			data.forEach(function(item) {
-				promises.push(self.getDiscussbyId(item.id));
+				promises.push(self.getDiscussbyId(item.id, ct));
 			});
 			return Promise.all(promises);
 		}).then(function(data) {
