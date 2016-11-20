@@ -30,7 +30,6 @@ body.hide-all-lines {
     background: linear-gradient(90deg, #8e8e90 66%, transparent 0) repeat-x;
     background-size: .2em 1px;
     background-position: 0 1.04em;
-    text-shadow: .05em 0 white, -.05em 0 white;
 }
 
 /*评论tip框*/
@@ -123,6 +122,11 @@ body.hide-all-lines {
     -moz-user-select: none;
     -ms-user-select: none;
     z-index: 10000;
+    box-sizing: content-box;
+
+    input, textarea {
+        font-size: 12px;
+    }
 }
 
 .mark-modal {
@@ -161,6 +165,7 @@ body.hide-all-lines {
         height: 100px;
         resize: none;
         outline: none;
+        font-size: 12px;
         box-sizing: border-box;
     }
     .mark-weibo {
@@ -194,6 +199,7 @@ body.hide-all-lines {
             text-decoration: none;
             outline: none;
             cursor: pointer;
+            vertical-align: middle;
         }
 
         .fmark-btn {
@@ -207,6 +213,7 @@ body.hide-all-lines {
             border-radius: 2px;
             vertical-align: middle;
             cursor: pointer;
+            line-height: 1.3;
 
             &:hover {
                 border-color: #7d3b3a;
@@ -270,6 +277,7 @@ body.hide-all-lines {
             a {
                 color: #6d8fa5;
                 cursor: pointer;
+                font-size: 12px;
 
                 &:hover {
                     background: #6d8fa5;
