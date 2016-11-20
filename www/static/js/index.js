@@ -240,6 +240,11 @@ class FMark {
             if (!currentRangeInfo.discuss) {
                 currentRangeInfo.discuss = [];
             }
+
+            if (data.share == 'weibo') {
+                let shareContent = '';
+                window.open(`http://service.weibo.com/share/share.php?url=${encodeURIComponent(location.href)}&type=icon&language=zh_cn&title=${currentRangeInfo.article_content.trim()} + -分享自${encodeURIComponent(location.href)}&style=simple`);
+            }
             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
                 _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});

@@ -135,7 +135,7 @@ class Modal {
                         </p>`;
             }
             _this.commentWrap.innerHTML = html;
-        }
+        })
         _this.commentWrap.onclick = function(e) {
             let targetClass = e.target.className;
             if (targetClass.indexOf('thumbs') > -1) {
