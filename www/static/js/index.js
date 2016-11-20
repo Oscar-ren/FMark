@@ -16,7 +16,7 @@ class FMark {
         this.fmarkList = {};
         //当前显示的评论id
         this.currentNoteId = '';
-        this.host = 'http://www.fmark.com:8360';
+        this.host = 'http://www.laughter.pub:80';
     }
 
     render() {}
@@ -167,9 +167,6 @@ class FMark {
                 let tag_index = Array.from(document.getElementsByClassName('note-dot')).findIndex(function(value, index, arr) {
                     return value == target;
                 })
-
-                console.log('tag_index', tag_index);
-
 
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])

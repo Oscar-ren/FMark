@@ -12,7 +12,7 @@ class Modal {
         this.markCallback = undefined;
         this.marking = false;
 
-        this.host = 'http://www.fmark.com:8360';
+        this.host = 'http://www.laughter.pub:80';
 	}
     initMarkModal() {
         let _this = this;
