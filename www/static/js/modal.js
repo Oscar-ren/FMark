@@ -1,7 +1,7 @@
 import {defered, getChildbyClass, hasContainNode, toSafeStr} from './base';
 import jsonp from 'jsonp';
+import {traversalStartLen, transfer, reverse} from './util';
 import {EventUtil} from './base';
-import querystring from 'querystring';
 
 class Modal {
 	constructor() {
@@ -107,9 +107,9 @@ class Modal {
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
-    initMarkComment(rangeInfo) {
+    initMarkComment(rangeInfo, callback, deletecomment) {
         let _this = this;
-        if (!rangeInfo.length) {
+        if (!Object.keys(rangeInfo).length) {
             return;
         }
         if (_this.markComment) {
@@ -128,16 +128,22 @@ class Modal {
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
         let data = [];
-        rangeInfo.forEach(function(item, index) {
-            data = data.concat(item.discuss);
-        });
+        for(let key in rangeInfo) {
+            data = data.concat(rangeInfo[key].discuss);
+        }
         let html = '';html += '<ul class="comment-ul">';
         for (let index = 0; index < data.length; index++) {
             let item = data[index];
             html += `<li class="comment-li ${index==0?'active':''}">
                         <div class="note-owner"><span class="author">${toSafeStr(item.name)}</span> 的批注</div>
                         <div class="note-content">${toSafeStr(item.discuss_content)}</div>
-                        <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
+                        <div class="note-tools">
+                            <a class="thumbs" dicuss_index="${index}">${item.thumbs || ''}${item.hasThumbs?'取消赞':'赞'}</a>
+                            <span class="del-wrapper">
+                                <span>·</span>
+                                <a class="del-note" dicuss_index="${index}">删除</a>
+                            </span>
+                        </div>
                     </li>`;
         }
         html += '</ul>';
@@ -159,19 +165,41 @@ class Modal {
             commentUl.childNodes.forEach(function(item, index) {
                 if (item.className.indexOf('active') > -1) {
                     item.className = item.className.replace('active', '');
+                    reverse(rangeInfo[data[index].comment_id]);
                 }
                 if (index == (page-1)) {
+                    //划线,给回调当前的信息id
+                    transfer(rangeInfo[data[index].comment_id]);
+                    if(callback instanceof Function) {
+                        callback(data[index].comment_id);
+                    }
                     item.className += ' active';
                 }
             });
         }
+        //第一次划线，以后的都在showPage里划线
+        transfer(rangeInfo[data[0].comment_id]);
+
         _this.commentWrap.onclick = function(e) {
             let targetClass = e.target.className;
             if (targetClass.indexOf('thumbs') > -1) {
-                let id = e.target.getAttribute('dicuss_id');
+                let index = e.target.getAttribute('dicuss_index');
+                let id = data[index].id;
                 jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
                     if (result) {
-                        e.target.innerHTML = result;
+                        e.target.innerHTML = (result.thumbs || '') + result.code;
+                        data[index].thumbs = result.thumbs;
+                        data[index].hasThumbs = result.code == '赞'? 0:1;
+                    }
+                })
+            } else if (targetClass.indexOf('del-note') > -1) {
+                let index = e.target.getAttribute('dicuss_index');
+                let id = data[index].id;
+                let comment_id = data[index].comment_id;
+                jsonp(_this.host + '/mark/deletecomment?id=' + comment_id, function(err, result) {
+                    if (result) {
+                        deletecomment(comment_id);
+                        _this.hideMarkComment();
                     }
                 })
             } else if (targetClass.indexOf('disable') > -1) {
@@ -201,8 +229,8 @@ class Modal {
             }
         }
     }
-    showMarkComment(posX, posY, data) {
-        this.initMarkComment(data);
+    showMarkComment(posX, posY, data, callback, deletecomment) {
+        this.initMarkComment(data, callback, deletecomment);
 
         this.markComment.style.top = posY + 6 + 'px';
         this.markComment.style.left = posX - 150  + 'px';

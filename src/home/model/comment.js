@@ -43,20 +43,29 @@ export default class extends think.model.base {
 		}).then(function(data) {
 			discussData.forEach(function(item, index) {
 				if (data[index] == '+') {
-					item['thumbs'] = 1;
+					item['hasThumbs'] = 1;
 				} else {
-					item['thumbs'] = 0;
+					item['hasThumbs'] = 0;
 				}
 			});
 			return Promise.resolve(discussData);
 		});
 	}
+	delDiscussbyId(id) {
+		let model = this.model("discuss");
+
+		return model.where({id: id}).delete();
+	}
 	deleteComment(id) {
 		let model = this.model("comment");
-
+		let discuss = this.model("discuss");
 		return model.where({
 			id: id
-		}).delete();
+		}).delete().then(function() {
+			return discuss.where({
+				comment_id: id
+			}).delete();
+		});
 	}
 	getComment(url, title, ct) {
 		let model = this.model("comment");

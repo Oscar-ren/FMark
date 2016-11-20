@@ -11,6 +11,11 @@ export default class extends Base {
     //auto render template file index_index.html
     return this.display();
   }
+  async deldiscussAction() {
+    let discuss_id = this.get('id');
+    let data =  await this.model('comment').delDiscussbyId(discuss_id);
+    return this.jsonp(data);
+  }
   async commentAction() {
     let comment_id = this.get('id');
     let data = await this.model('comment').getDiscussbyId(comment_id);
@@ -30,7 +35,7 @@ export default class extends Base {
       await this.session('thumbs'+discuss_id, '+');
       code = '取消赞';
     }
-    return this.jsonp((data['thumbs'] || '')+code);
+    return this.jsonp({thumbs: data['thumbs'], code: code});
   }
   randomName() {
     return '游客' + Math.floor(Math.random() * 1000);
