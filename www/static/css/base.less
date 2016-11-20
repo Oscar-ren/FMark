@@ -146,7 +146,15 @@ body.hide-all-lines {
             left: -7px;
         }
     }
+    .content-wrap {
+        position: relative;
 
+        .count-wrap {
+            position: absolute;
+            bottom: -12px;
+            right: 2px;
+        }
+    }
     .mark-content {
         width: 100%;
         padding: 10px;
@@ -253,8 +261,7 @@ body.hide-all-lines {
 
         .note-content {
             line-height: 1.5;
-            max-height: 150px;
-            overflow-y: auto;
+            word-break: break-all;
         }
 
         .note-tools {

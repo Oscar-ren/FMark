@@ -161,4 +161,9 @@ let defered = () => {
     }
     return false;
  }
-export {EventUtil, getAjax, encodeUrlParam, setCookie, getCookie, getChildbyClass, defered, hasContainNode};
+ let toSafeStr = (unsafe) => {
+    let safeStr = unsafe.replace(/\</g, '&#60;');
+    safeStr = safeStr.replace(/\>/g, '&#62;');
+    return safeStr;
+ }
+export {EventUtil, getAjax, encodeUrlParam, setCookie, getCookie, getChildbyClass, defered, hasContainNode, toSafeStr};

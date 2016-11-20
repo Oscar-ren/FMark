@@ -1,4 +1,4 @@
-import {defered, getChildbyClass, hasContainNode} from './base';
+import {defered, getChildbyClass, hasContainNode, toSafeStr} from './base';
 import jsonp from 'jsonp';
 import {EventUtil} from './base';
 import querystring from 'querystring';
@@ -19,14 +19,17 @@ class Modal {
         if (_this.markModal) {
         	return;
         }
+        let maxLength = 255;
         let markModal = document.createElement('div');
         markModal.className = 'mark-modal';
         markModal.innerHTML = `<div class="mark-triangle"><i class="triangle"></i></div>
                                <div class="mark-wrap">
-                                    <div><textarea class="mark-content" placeholder="你的批注"></textarea></div>
+                                    <div class="content-wrap">
+                                        <textarea class="mark-content" placeholder="你的批注"></textarea>
+                                        <div class="count-wrap"><span class="now-count">0</span>/${maxLength}</div>
+                                    </div>
                                     <div class="share">分享到 
-                                        <label><input class="share-weibo" type="radio" name="share" /><i class="mark-weibo"></i></label>
-                                        <label><input class="share-qq" type="radio" name="share" /><i class="mark-qq"></i></label>
+                                        <label><input class="share-weibo" type="checkbox" name="share" /><i class="mark-weibo"></i></label>
                                     </div>
                                     <div class="tool-bar">
                                         <input class="mark-name" placeholder="请填入名称"/>
@@ -41,9 +44,18 @@ class Modal {
 
         let markContent = _this.markContent = getChildbyClass(markModal, 'mark-content');
         let markName = _this.markName = getChildbyClass(markModal, 'mark-name');
-        let shareQQ  = getChildbyClass(markModal, 'share-qq');
         let shareWeibo = getChildbyClass(markModal, 'share-weibo');
-        
+        let nowCount = _this.nowCount = getChildbyClass(markModal, 'now-count');
+        markContent.onkeyup = function(ev) {
+            markContent.style.borderColor = '';
+            let length = markContent.value.length;
+            if (length <= maxLength) {
+                nowCount.innerHTML = length;
+            } else {
+                markContent.value = markContent.value.slice(0, maxLength);
+                nowCount.innerHTML = maxLength;
+            }
+        }
         markModal.onclick = function(ev) {
             let targetClass = ev.target.className;
             if (targetClass.indexOf('close-btn') > -1) {
@@ -56,11 +68,11 @@ class Modal {
                     if (shareWeibo.checked) {
                         share = 'weibo';
                     }
-                    if (shareQQ.checked) {
-                        share = 'qq';
-                    }
                     // share && window.open(share);
                     _this.popupDefer.resolve({code: 'mark', msg: markContent.value, name: markName.value, share: share});
+                } else {
+                    _this.markContent.focus();
+                    _this.markContent.style.borderColor = 'red';
                 }
             }
         }
@@ -71,6 +83,8 @@ class Modal {
     		this.initMarkModal();
     	}
         this.markContent.value = '';
+        this.markContent.style.borderColor = '';
+        this.nowCount.innerHTML = '0';
     	//修正的像素是为了尖角在所想的位置
         this.markModal.style.top = posY + 6 + 'px';
         this.markModal.style.left = posX - 150  + 'px';
@@ -121,8 +135,8 @@ class Modal {
         for (let index = 0; index < data.length; index++) {
             let item = data[index];
             html += `<li class="comment-li ${index==0?'active':''}">
-                        <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
-                        <div class="note-content">${item.discuss_content}</div>
+                        <div class="note-owner"><span class="author">${toSafeStr(item.name)}</span> 的批注</div>
+                        <div class="note-content">${toSafeStr(item.discuss_content)}</div>
                         <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
                     </li>`;
         }
