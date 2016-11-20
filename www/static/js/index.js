@@ -24,7 +24,7 @@ class FMark {
 
         //TODO 设置cookie,过期时间为1天
         if(!getCookie('fmark')) {
-            setCookie('fmark', (new Date()), 1);
+            setCookie('fmark', (new Date()).getTime(), 1);
         }
 
         let _this = this;
@@ -41,8 +41,9 @@ class FMark {
         };
         jsonp( _this.host + '/mark/getcomment?' + encodeUrlParam(param), function(err, result) {
             for(let key in result) {
-                //TODO 每一条判断是否当前用户有权限修改,hasAuthor不会发给数据库
+                //判断当前用户是否有权限修改,有权限更新cookie过期时间,hasAuthor不会发给数据库
                 if(result[key].cookie == getCookie('fmark')) {
+                    setCookie('fmark', getCookie('fmark'), 1);
                     result[key].hasAuthor = true;
                 }
                 result[key].position = JSON.parse(result[key].position);
@@ -50,7 +51,6 @@ class FMark {
                 if(result[key].type == 2) {
                     _this.addNoteTip(result[key], result[key].id);
                 }else {
-                    //TODO 其他人的划线样式不一样
                     _this.markLine(result[key], result[key].id);
                 }
             }
@@ -71,6 +71,7 @@ class FMark {
             e = EventUtil.getEvent(e);
             let target = EventUtil.getTarget(e);
             Modal.hideMarkPopup();
+            Modal.hideMarkComment(target);
 
             //选取时间大于300ms && 鼠标停止时所在元素不是html
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && target !== document.getElementsByTagName('html')[0]) {
@@ -81,6 +82,7 @@ class FMark {
                 if(selObj.toString()) {
 
                     let common_node = selRange.commonAncestorContainer;
+                    //公共父级不能是text
                     if(selRange.commonAncestorContainer.nodeType !== 1) {
                         common_node = selRange.commonAncestorContainer.parentNode;
                     }
@@ -101,26 +103,26 @@ class FMark {
                             text_length: selRange.toString().trim().length,
                             common_tag: common_node.nodeName,
                             tag_index: tag_index,
-                            right: rangeRect[rangeRect.length - 1].right,
-                            bottom: rangeRect[rangeRect.length - 1].bottom,
-                            left: rangeRect[rangeRect.length - 1].left,
-                            top: rangeRect[rangeRect.length - 1].top
+                            right: rangeRect[rangeRect.length - 1].right + window.pageXOffset,
+                            bottom: rangeRect[rangeRect.length - 1].bottom + window.pageYOffset,
+                            left: rangeRect[rangeRect.length - 1].left + window.pageXOffset,
+                            top: rangeRect[rangeRect.length - 1].top + window.pageYOffset
                         },
                         cookie: getCookie('fmark')
                     }
 
                     //新数据
-                    Modal.showMarkPopup(rangePosMiddle, rangeRect[rangeRect.length - 1].bottom).then(function(data) {
+                    Modal.showMarkPopup(rangePosMiddle + window.pageXOffset, rangeRect[rangeRect.length - 1].bottom + window.pageYOffset).then(function(data) {
                         //划线和评论请求格式一样
                         let param = '';
                         if(data.code == 'underline') {
                             param = Object.assign(currentRangeInfo, {type: 1});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
-                                _this.fmarkList[id] = Object.assign(param, {id: id});
+                                _this.fmarkList[id] = Object.assign(param, {id: id, hasAuthor: true});
                                 _this.markLine(_this.fmarkList[id]);
                             });
                         }else if(data.code == 'mark') {
-                            param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg});
+                            param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
                                 _this.fmarkList[id] = Object.assign(param, {id: id});
                                 _this.addNoteTip(_this.fmarkList[id]);
@@ -144,12 +146,14 @@ class FMark {
             if(target && target.nodeName.toUpperCase() == 'FM') {
                 let rangeInfo = _this.fmarkList[target.dataset.id];
 
+                //看是否有权限操作
+                if(!_this.fmarkList[target.dataset.id].hasAuthor) return;
+
                 //删除划线
                 Modal.showMarkPopup((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, true).then(function(data) {
                     if(data.code == 'del-underline') {
                         jsonp( _this.host + '/mark/deletecomment?' + encodeUrlParam({id: target.dataset.id}),
                             function(err, result) {
-                                console.log(result);
                                 let currentRangeId = target.dataset.id;
                                 reverse(_this.fmarkList[currentRangeId]);
                                 delete _this.fmarkList[currentRangeId];
@@ -157,7 +161,7 @@ class FMark {
                         );
                     }
                     if(data.code == 'mark') {
-          let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
+                        let param = Object.assign(rangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
                         jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, id) {
                             _this.fmarkList[id] = Object.assign(param, {id: id});
                             _this.addNoteTip(_this.fmarkList[id]);
@@ -168,7 +172,7 @@ class FMark {
                 });
 
             //点击评论tip显示划线
-            }else if(target && target.getAttribute('class') == 'note-dot') {
+            }else if(target && target.getAttribute('class') && target.getAttribute('class').indexOf('note-dot') > -1) {
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])
                 }
@@ -192,7 +196,6 @@ class FMark {
 
     //添加评论小tip功能
     addNoteTip(currentRangeInfo) {
-        console.log(currentRangeInfo.cookie == getCookie('fmark'), currentRangeInfo.cookie, getCookie('fmark'));
         //计算选中文本最后一个字符宽度
         let lastWordNode = document.getElementsByClassName('fmark-hide')[0],
             className = '';
@@ -210,7 +213,7 @@ class FMark {
         //添加标识
         className = currentRangeInfo.hasAuthor ? 'note-dot isSelf' : 'note-dot';
         noteDotNode.setAttribute('data-id', currentRangeInfo.id);
-        noteDotNode.innerHTML = '<div class=' + className + ' style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
+        noteDotNode.innerHTML = '<div class="' + className + '" style=" top:' + tipTop + 'px; left:' + tipLeft + 'px "></div>';
         document.getElementById('markings-layer').appendChild(noteDotNode);
     }
     //划线功能
