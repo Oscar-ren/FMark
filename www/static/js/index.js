@@ -163,17 +163,27 @@ class FMark {
 
             //点击评论tip显示划线
             }else if(target && target.getAttribute('class') && target.getAttribute('class').indexOf('note-dot') > -1) {
+
+                let tag_index = Array.from(document.getElementsByClassName('note-dot')).findIndex(function(value, index, arr) {
+                    return value == target;
+                })
+
+                console.log('tag_index', tag_index);
+
+
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])
                 }
+                //取当前range的id,rangeInfo为最后一次的选取range
+                let noteId = target.parentNode['data-id'];
+                if(noteId.length == 0) {
+                    return;
+                }
                 document.body.classList.add('hide-all-lines');
+                let rangeInfo = _this.fmarkList[noteId[noteId.length -1]];
 
-                //取当前range的id
-                let noteId = target.parentNode['data-id'],
-                    rangeInfo = _this.fmarkList[noteId[0]];
-
-                //TODO 切换评论的时候要改变这个值
-                _this.currentNoteId = noteId[0];
+                _this.currentNoteId = noteId[noteId.length -1];
+                //拼装评论信息给评论框
                 let rangeInfos = {};
                 for(let i = 0; i < noteId.length; i++) {
                     let id = noteId[i];
@@ -185,7 +195,21 @@ class FMark {
                     _this.currentNoteId = currentDisplayId;
                 }, function(rangeid) {
                     reverse(_this.fmarkList[rangeid]);
+
+                    //从标记父级属性里删掉当前id
+                    let parentIds = target.parentNode['data-id'];
+                    let rangeIndex = parentIds.findIndex(function(value, index) {
+                        return value == rangeid;
+                    })
+                    parentIds.splice(rangeIndex, 1);
+
+                    //如果这时候noteIds为空,删除这个标记
+                    if(parentIds.length == 0) {
+                        let currentNode = document.getElementsByClassName('note-dot')[tag_index];
+                        currentNode.parentNode.parentNode.removeChild(currentNode.parentNode);
+                    }
                     delete _this.fmarkList[rangeid];
+                    _this.currentNoteId = '';
                 });
                 _this.markLine(rangeInfo);
 
@@ -250,12 +274,11 @@ class FMark {
             }
 
             if (data.share == 'weibo') {
-                let shareContent = '';
                 window.open(`http://service.weibo.com/share/share.php?url=${encodeURIComponent(location.href)}&type=icon&language=zh_cn&title=${currentRangeInfo.article_content.trim()} + -分享自${encodeURIComponent(location.href)}&style=simple`);
             }
             param = Object.assign(currentRangeInfo, {type: 2, discuss_content: data.msg, name: data.name});
             jsonp( _this.host + '/mark/add?' + encodeUrlParam(param), function(err, data) {
-                _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id});
+                _this.fmarkList[data.comment_id] = Object.assign(param, {id: data.comment_id, hasAuthor: true});
                 _this.fmarkList[data.comment_id].discuss = [Object.assign({}, data.discuss)];
                 _this.addNoteTip(_this.fmarkList[data.comment_id]);
             });
@@ -273,3 +296,6 @@ class FMark {
 }
 
 window.FMark = FMark;
+
+var mark = new FMark();
+mark.bindEvent();

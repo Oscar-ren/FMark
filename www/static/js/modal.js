@@ -139,10 +139,12 @@ class Modal {
                         <div class="note-content">${toSafeStr(item.discuss_content)}</div>
                         <div class="note-tools">
                             <a class="thumbs" dicuss_index="${index}">${item.thumbs || ''}${item.hasThumbs?'取消赞':'赞'}</a>
-                            <span class="del-wrapper">
+                            ${rangeInfo[data[index].comment_id].hasAuthor ?
+                            (`<span class="del-wrapper">
                                 <span>·</span>
                                 <a class="del-note" dicuss_index="${index}">删除</a>
-                            </span>
+                            </span>`)
+                            : '' }
                         </div>
                     </li>`;
         }
