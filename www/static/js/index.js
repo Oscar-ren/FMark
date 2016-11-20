@@ -16,7 +16,7 @@ class FMark {
         this.fmarkList = {};
         //当前显示的评论id
         this.currentNoteId = '';
-        this.host = 'http://www.fmark.com:8360';
+        this.host = 'http://laughter.pub';
     }
 
     render() {}
