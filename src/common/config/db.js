@@ -7,11 +7,11 @@ export default {
   type: 'mysql',
   adapter: {
     mysql: {
-      host: '10.120.253.177',
-      port: '3474',
-      database: 'duanyuwen',
-      user: 'duanyuwen',
-      password: 'Duanyuwen2015',
+      host: '127.0.0.1',
+      t: '3306',
+      database: 'fmark',
+      user: 'fmark',
+      password: 'fmark',
       prefix: 'mark_',
       encoding: 'utf8'
     },
