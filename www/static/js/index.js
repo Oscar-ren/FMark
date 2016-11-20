@@ -14,7 +14,7 @@ import {EventUtil, encodeUrlParam, setCookie, getCookie} from './base';
 import Modal from './modal';
 import jsonp from 'jsonp';
 /**
- * 批注组件,兼容IE9
+ * 兼容IE9
  */
 class FMark {
     constructor() {
@@ -72,6 +72,7 @@ class FMark {
                 }
             }
             for(let key in noteList) {
+                //noteList[key]里面存的是一样位置的id
                 _this.addNoteTip(_this.fmarkList[noteList[key][0]], noteList[key]);
             }
         });
@@ -185,9 +186,9 @@ class FMark {
                     return;
                 }
                 document.body.classList.add('hide-all-lines');
-                let rangeInfo = _this.fmarkList[noteId[noteId.length -1]];
+                let rangeInfo = _this.fmarkList[noteId[0]];
 
-                _this.currentNoteId = noteId[noteId.length -1];
+                _this.currentNoteId = noteId[0];
                 //拼装评论信息给评论框
                 let rangeInfos = {};
                 for(let i = 0; i < noteId.length; i++) {
@@ -232,7 +233,7 @@ class FMark {
         //判断当前位置是否已有评论,有的话,混合
         let idSets = [];
         for(let key in this.fmarkList) {
-            if(this.fmarkList[key].position.right == currentRangeInfo.position.right) {
+            if(this.fmarkList[key].position.right == currentRangeInfo.position.right && this.fmarkList[key].position.top == currentRangeInfo.position.top) {
                 idSets.push(key);
             }
         }
