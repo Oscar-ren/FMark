@@ -12,7 +12,7 @@ class Modal {
         this.markCallback = undefined;
         this.marking = false;
 
-        this.host = 'http://www.laughter.pub:80';
+        this.host = 'http://laughter.pub';
 	}
     initMarkModal() {
         let _this = this;
