@@ -54,11 +54,9 @@ class Modal {
                     _this.hideMarkModal();
                     let share = '';
                     if (shareWeibo.checked) {
-                        // share = `http://service.weibo.com/share/share.php?url=${encodeURIComponent(location.href)}&type=icon&language=zh_cn&title=${document.title}&pic=${share.pic}&searchPic=true&style=simple`;
                         share = 'weibo';
                     }
                     if (shareQQ.checked) {
-                        // share = `http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(location.href)}&desc=${share.content}&title=${document.title}&summary=fqwva&pics=${share.pic}&style=203&otype=share`;
                         share = 'qq';
                     }
                     // share && window.open(share);
@@ -115,36 +113,77 @@ class Modal {
             this.commentWrap = commentWrap;
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
-        let html = '';
-        rangeInfo.forEach(function(data, index) {
-            html += '<ul class="comment-ul">';
-            for (let index = 0; index < data.length; index++) {
-                let item = data[index];
-                html += `<li>
-                            <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
-                            <div class="note-content">${item.discuss_content}</div>
-                            <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
-                        </li>`;
-            }
-            html += '</ul>';
+        let data = [];
+        rangeInfo.forEach(function(item, index) {
+            data = data.concat(item.discuss);
+        });
+        let html = '';html += '<ul class="comment-ul">';
+        for (let index = 0; index < data.length; index++) {
+            let item = data[index];
+            html += `<li class="comment-li ${index==0?'active':''}">
+                        <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
+                        <div class="note-content">${item.discuss_content}</div>
+                        <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
+                    </li>`;
+        }
+        html += '</ul>';
 
-            if (data.length > 1) {
+        if (data.length > 1) {
+            html += `<p class="comment-page">
+                        <span class="now">1</span>/<span class="all">${data.length}</span><span class="page-prev disable"></span><span class="page-next"></span>
+                    </p>`;
+        }
+        _this.commentWrap.innerHTML = html;
 
-                html += `<p class="comment-page">
-                            <span class="now">1</span>/<span class="all">${data.length}</span>
-                        </p>`;
-            }
-            _this.commentWrap.innerHTML = html;
-        })
+        let now = getChildbyClass(_this.commentWrap, 'now');
+        let pagePrev = getChildbyClass(_this.commentWrap, 'page-prev');
+        let pageNext = getChildbyClass(_this.commentWrap, 'page-next');
+        let commentUl = getChildbyClass(_this.commentWrap, 'comment-ul');
+        let nowPage = 1;
+        let showPage = (page) => {
+            now.innerHTML = page;
+            commentUl.childNodes.forEach(function(item, index) {
+                if (item.className.indexOf('active') > -1) {
+                    item.className = item.className.replace('active', '');
+                }
+                if (index == (page-1)) {
+                    item.className += ' active';
+                }
+            });
+        }
         _this.commentWrap.onclick = function(e) {
             let targetClass = e.target.className;
             if (targetClass.indexOf('thumbs') > -1) {
                 let id = e.target.getAttribute('dicuss_id');
                 jsonp(_this.host + '/mark/thumbs?id=' + id, function(err, result) {
                     if (result) {
-                        e.target.innerHTML = result; 
+                        e.target.innerHTML = result;
                     }
                 })
+            } else if (targetClass.indexOf('disable') > -1) {
+                return;
+            } else if (targetClass.indexOf('page-prev') > -1) {
+                if (nowPage > 2) {
+                    nowPage--;
+                } else {
+                    nowPage = 1;
+                    if (pagePrev.className.indexOf('disable') < 0) {
+                        pagePrev.className += ' disable';
+                    }
+                }
+                pageNext.className = pageNext.className.replace('disable', '');
+                showPage(nowPage);
+            } else if (targetClass.indexOf('page-next') > -1) {
+                if (nowPage < data.length - 1) {
+                    nowPage++;
+                } else {
+                    nowPage = data.length;
+                    if (pageNext.className.indexOf('disable') < 0) {
+                        pageNext.className += ' disable';
+                    }
+                }
+                pagePrev.className = pagePrev.className.replace('disable', '');
+                showPage(nowPage);
             }
         }
     }
