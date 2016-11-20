@@ -88,9 +88,14 @@ class FMark {
             if(window.getSelection && _this.ifDrag && (Date.now() - _this.mouseDownStartTime > 300) && target !== document.getElementsByTagName('html')[0]) {
 
                 let selObj = window.getSelection(),
+                    selRange = {};
+
+                if(selObj) {
                     selRange = selObj.getRangeAt(0);
+                }
+
                 //选中区域有文字
-                if(selObj.toString()) {
+                if(selRange && selObj.toString()) {
 
                     let common_node = selRange.commonAncestorContainer;
                     //公共父级不能是text
@@ -101,8 +106,7 @@ class FMark {
                         return value == common_node;
                     }),
                         //选取区域的位置
-                        rangeRect = selRange.getClientRects(),
-                        rangePosMiddle = (rangeRect[rangeRect.length - 1].left + rangeRect[rangeRect.length - 1].right) / 2;
+                        rangeRect = selRange.getClientRects();
 
                     //需要储存的信息
                     let currentRangeInfo = {
@@ -170,15 +174,16 @@ class FMark {
 
                 //TODO 切换评论的时候要改变这个值
                 _this.currentNoteId = noteId[0];
-                let rangeInfos = [];
+                let rangeInfos = {};
                 for(let i = 0; i < noteId.length; i++) {
-                    rangeInfos.push(_this.fmarkList[noteId[i]]);
+                    let id = noteId[i];
+                    rangeInfos[id] = _this.fmarkList[noteId[i]];
                 }
 
-                console.log(rangeInfos);
-
                 //显示划线,弹出评论框
-                Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, rangeInfos);
+                Modal.showMarkComment((rangeInfo.position.right + rangeInfo.position.left)/2, rangeInfo.position.bottom, rangeInfos, function(currentDisplayId) {
+                    _this.currentNoteId = currentDisplayId;
+                });
                 _this.markLine(rangeInfo);
 
             //点其他地方隐藏当前存储的已显示的评论的划线

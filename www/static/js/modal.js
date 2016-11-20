@@ -1,7 +1,7 @@
 import {defered, getChildbyClass, hasContainNode} from './base';
 import jsonp from 'jsonp';
+import {traversalStartLen, transfer, reverse} from './util';
 import {EventUtil} from './base';
-import querystring from 'querystring';
 
 class Modal {
 	constructor() {
@@ -93,9 +93,9 @@ class Modal {
         this.markModal && (this.markModal.style.display = 'none');
         this.marking = false;
     }
-    initMarkComment(rangeInfo) {
+    initMarkComment(rangeInfo, callback) {
         let _this = this;
-        if (!rangeInfo.length) {
+        if (!Object.keys(rangeInfo).length) {
             return;
         }
         if (_this.markComment) {
@@ -114,16 +114,22 @@ class Modal {
         }
         // _this.commentWrap.innerHTML = '<img src="'+this.host+'/static/img/loading.jpg">';
         let data = [];
-        rangeInfo.forEach(function(item, index) {
-            data = data.concat(item.discuss);
-        });
+        for(let key in rangeInfo) {
+            data = data.concat(rangeInfo[key].discuss);
+        }
         let html = '';html += '<ul class="comment-ul">';
         for (let index = 0; index < data.length; index++) {
             let item = data[index];
             html += `<li class="comment-li ${index==0?'active':''}">
                         <div class="note-owner"><span class="author">${item.name}</span> 的批注</div>
                         <div class="note-content">${item.discuss_content}</div>
-                        <div class="note-tools"><a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a></div>
+                        <div class="note-tools">
+                            <a class="thumbs" dicuss_id="${item.id}">${item.thumbs || ''}${item.thumbs?'取消赞':'赞'}</a>
+                            <span class="del-wrapper">
+                                <span>·</span>
+                                <a class="del-note">删除</a>
+                            </span>
+                        </div>
                     </li>`;
         }
         html += '</ul>';
@@ -145,8 +151,14 @@ class Modal {
             commentUl.childNodes.forEach(function(item, index) {
                 if (item.className.indexOf('active') > -1) {
                     item.className = item.className.replace('active', '');
+                    reverse(rangeInfo[data[index].comment_id]);
                 }
                 if (index == (page-1)) {
+                    //划线,给回调当前的信息id
+                    transfer(rangeInfo[data[index].comment_id]);
+                    if(callback instanceof Function) {
+                        callback(data[index].comment_id);
+                    }
                     item.className += ' active';
                 }
             });
@@ -187,8 +199,8 @@ class Modal {
             }
         }
     }
-    showMarkComment(posX, posY, data) {
-        this.initMarkComment(data);
+    showMarkComment(posX, posY, data, callback) {
+        this.initMarkComment(data, callback);
 
         this.markComment.style.top = posY + 6 + 'px';
         this.markComment.style.left = posX - 150  + 'px';
