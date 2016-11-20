@@ -9,6 +9,7 @@
 
 <script>
 import './assets/css/common.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import eventHub from './components/eventHub.vue';
 import top from './components/top';
 
@@ -25,39 +26,30 @@ export default {
   	}
   },
   created() {
-    this.checkLog();
     eventHub.$on('login', this.logIn);
     eventHub.$on('logout', this.logOut);
   },
   methods: {
-    checkLog() {
-      let user_id = localStorage.getItem('user_id');
-      console.log(user_id)
-      
-      if(user_id) {
-        this.$router.push('user');
-        this.user.log = true;
-        this.user.user_id = user_id;
-      }else{
-        this.$router.push('signup');
-      }
-    },
+
     logIn(user_id) {
-      this.user = {
-        user_id: user_id,
-        log: true
-      }
-      this.$router.push('user');
+      this.user.user_id = user_id;
+      this.user.log = true;
+      console.log(this.user);
+      this.$router.push('index');
     },
     logOut() {
       this.user.log = false;
       this.user.user_id = '';
-      this.$router.push('signup');
+      console.log(this.user);
+
+      this.$router.push('index');
     }
   },
 }
 </script>
 
-<style>
-
+<style scoped>
+  .content{
+    margin-top: 30px;
+  }
 </style>

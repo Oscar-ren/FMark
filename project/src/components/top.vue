@@ -2,36 +2,34 @@
 	<div class="header">
 		<el-row>
 			<el-col :span="14">
-				<div class="grid-content logo"></div>
+				<div class="grid-content logo">
+					<router-link :to="{ path: 'index' }">FMark</router-link>
+				</div>
 			</el-col>
 			<el-col :span="10">
 				<div class="grid-content user">
-					<div v-show="user.log">
-						<span>{{user.user_id}}</span>
-						<el-button type="primary" @click="logout()">退出</el-button>
+					<div v-show="user.log" class="user-log">
+						<el-dropdown trigger="click">
+						  <span class="el-dropdown-link">
+						    {{user.user_id}}
+						  </span>
+						  <el-dropdown-menu slot="dropdown">
+						    <el-dropdown-item>
+						    	<router-link :to="{ path: 'user' }">控制台</router-link>
+						    </el-dropdown-item>
+						    <el-dropdown-item>
+						    	<a href="#" @click.prevent="logout">登出</a>
+						    </el-dropdown-item>
+						  </el-dropdown-menu>
+						</el-dropdown>
 					</div>
-					<div v-show="!user.log">
-						<el-form :inline="true" :model="log" class="log">
-						  <el-form-item>
-						    <el-input v-model="log.user_id" placeholder="账号"></el-input>
-						  </el-form-item>					  
-						  <el-form-item>
-						    <el-input v-model="log.password" placeholder="密码" type="password"></el-input>
-						  </el-form-item>
-						  <el-form-item>
-						    <el-button type="primary" @click="signIn()">登录</el-button>
-						  </el-form-item>
-						</el-form>
+					<div v-show="!user.log" class="user-opt">
+						<router-link :to="{ path: 'signin' }">登录</router-link>
+						<router-link :to="{ path: 'signup' }">注册</router-link>
 					</div>	
 				</div>
 			</el-col>
 		</el-row>
-		<el-dialog title="提示" size="tiny" v-show="alertInfo.show">
-		  <span>{{alertInfo.info}}</span>
-		  <span slot="footer" class="dialog-footer">
-		    <el-button @click.native="alertInfo.show = false">确定</el-button>
-		  </span>
-		</el-dialog>
 	</div>
 </template>
 
@@ -39,7 +37,7 @@
 <script>
 import eventHub from '../components/eventHub.vue';
 import 'element-ui/lib/theme-default/index.css';
-import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
+import {dropdownMenu, dropdownItem, dropdown, form, formItem, row, col, input ,button} from 'element-ui';
 	export default {
 		components: {
 			elInput: input,
@@ -48,7 +46,9 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 			elCol: col,
 			elForm: form,
 			elFormItem: formItem,
-			elDialog: dialog
+			elDropdown: dropdown,
+			elDropdownMenu: dropdownMenu,
+			elDropdownItem: dropdownItem,
 		},
 		props: {
 			user:{
@@ -68,35 +68,8 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 			}
 		},
 		methods: {
-			signIn() {
-				let params = {
-					user_id: this.log.user_id,
-					password: this.log.password,
-				}
-				console.log(this)
-				let alert = '';
-				this.$http.post('/usercenter/signin', params, {emulateJSON: true}).then((res) => {
-					let resData = res.body;
-					let errno = resData.errno;
-					let errmsg = resData.errmsg;
-					if(errno === 0) {
-						eventHub.$emit('login' ,this.log.user_id);
-						localStorage.setItem('user_id', resData.data);
-						this.$router.push('user');
-					}else{
-						this.alertInfo = {
-							show: true,
-							info: errmsg
-						}
-					}
-				}, (res) => {
-						this.alertInfo = {
-							show: true,
-							info: errmsg
-					}
-				})
-			},
 			logout() {
+				console.log(1)
 				localStorage.removeItem('user_id');
 				eventHub.$emit('logout');
 			},
@@ -111,18 +84,28 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 <style scoped>
 	.header{
 		width: 100%;
-		height: 80px;
+		height: 60px;
+		line-height: 60px;
+		box-sizing: border-box;
+		background: rgba(230,246,255,.2);
+		color: #2c97e8;
+		font-weight: bold;
 	}
-	.fl{
-		float: left;
-	}
-	.fr{
-		float: right;
+	.header a:hover,
+	.el-dropdown-menu a:hover{
+		text-decoration: none;
+		color: #2c97e8;
 	}
 	.logo{
+		padding:0 15px;
+		margin-left: 15px;
 		width: 60px;
 		height: 60px;
-		background: url(/assets/css);
+	}
+	.logo a{
+		color: #2c97e8;
+		font-size: 24px;
+		font-weight: bold;
 	}
 	.user{
 		height: 60px;
@@ -130,4 +113,36 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 		text-align: right;
 		padding-right: 30px;
 	}
+	.user .user-log, 
+	.user .user-opt{
+		text-align: left;
+		display: inline-block;
+		width: 200px;
+	} 
+	.el-dropdown{
+		display: block;
+		width: 100%;
+		color: #2c97e8;
+		font-weight: bold;
+		cursor: pointer;
+	}
+	.el-dropdown-menu{
+		width: 200px;
+	}
+	.el-dropdown-menu span{
+		text-align: center;
+		display: inline-block;
+		width: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.el-dropdown-menu li:hover,
+	.el-dropdown-menu a,
+	.el-dropdown-menu li{
+		color: #2c97e8;
+		font-weight: bold;
+	}
+	
 </style>

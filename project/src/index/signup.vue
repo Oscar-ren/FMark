@@ -1,9 +1,13 @@
 <template>
 	<div class="signup">
 		<el-row>
-			<el-col :span="14">
+			<el-col :span="8">
+				<div class="grid-content seat">
+				</div>
+			</el-col>
+			<el-col :span="8">
 				<div class="grid-content userInfo">
-					<el-form :model="register" label-width="80px">
+					<el-form :model="register">
 					  <el-form-item label="帐号">
 					    <el-input v-model="register.user_id"></el-input>
 					  </el-form-item>
@@ -19,21 +23,16 @@
 					</el-form>
 				</div>
 			</el-col>
-			<el-col :span="10">
-				<div class="grid-content banner">
+			<el-col :span="8">
+				<div class="grid-content seat">
 				</div>
 			</el-col>
 		</el-row>
-		<el-dialog title="提示" size="tiny" v-show="alertInfo.show">
-		  <span>{{alertInfo.info}}</span>
-		  <span slot="footer" class="dialog-footer">
-		    <el-button @click.native="alertInfo.show = false">确定</el-button>
-		  </span>
-		</el-dialog>
 	</div>
 </template>
 
 <script>
+import eventHub from '../components/eventHub.vue';
 import 'element-ui/lib/theme-default/index.css';
 import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 	export default {
@@ -53,10 +52,6 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 					password: '',
 					email: ''
 				},
-				alertInfo: {
-					show: false,
-					info: ''
-				},
 			}
 		},
 		methods: {
@@ -70,15 +65,13 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 					let errno = resData.errno;
 					let errmsg = resData.errmsg;
 					if(errno === 0) {
-						this.$router.push('user');
-						this.alertInfo.info = '注册成功！';
+						eventHub.$emit('login' ,this.register.user_id);
+						localStorage.setItem('user_id', resData.data);
 					}else{
-						this.alertInfo.info = '注册失败！';
+						
 					}
 				}, (res) => {
-						this.alertInfo.info = '注册失败！';
 				})
-				this.alertInfo.show = true;			
 			}
 		},
 	}
@@ -86,19 +79,7 @@ import {dialog, form, formItem, row, col, input ,button} from 'element-ui';
 
 
 <style scoped>
-	.header{
-		width: 100%;
-		height: 80px;
-		/*background: ;*/
-	}
-	.fl{
-		float: left;
-	}
-	.fr{
-		float: right;
-	}
-	.banner{
-		width: 400px;
-		height: 400px;
+	.seat{
+		height: 1px;
 	}
 </style>
