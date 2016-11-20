@@ -1,3 +1,11 @@
+/**
+ * FMark 提供网站划线标注服务
+ *
+ * 不依赖其他框架,如jQuery等
+ * 采用es6语法,webpack打包
+ * 如遇问题请提交到 https://github.com/Oscar-ren/FMark/issues
+ */
+
 'use strict';
 
 import '../css/base.less';
@@ -167,9 +175,6 @@ class FMark {
                 let tag_index = Array.from(document.getElementsByClassName('note-dot')).findIndex(function(value, index, arr) {
                     return value == target;
                 })
-
-                console.log('tag_index', tag_index);
-
 
                 if(_this.currentNoteId) {
                     reverse(_this.fmarkList[_this.currentNoteId])
