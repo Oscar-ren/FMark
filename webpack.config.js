@@ -20,10 +20,11 @@ module.exports = {
             }
         ]
     },
-    externals: {
-        jquery: 'window.$'
-    },
     plugins: [
-        new webpack.BannerPlugin('welcome to use FMark!')
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        })
     ]
 }
